@@ -1,5 +1,6 @@
 package com.Jetvac2.MicroJam;
 
+import com.Jetvac2.MicroJam.Enemies.BaseEnemy;
 import com.Jetvac2.MicroJam.Player.Player;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -17,18 +19,21 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class Main implements ApplicationListener {
-    ShapeRenderer backgroundRenderer;
-    SpriteBatch playerBatch;
-    Player player;
-    FitViewport worldViewport;
+    private ShapeRenderer backgroundRenderer;
+    private SpriteBatch playerBatch;
+    private SpriteBatch enemyBatch;
+    private Player player;
+    private FitViewport worldViewport;
+    private BaseEnemy enemy;
 
     @Override
     public void create() {
         this.worldViewport = new FitViewport(2f, 2f, new OrthographicCamera());
         this.backgroundRenderer = new ShapeRenderer();
         this.playerBatch = new SpriteBatch();
+        this.enemyBatch = new SpriteBatch();
         this.player = new Player();
-       
+        this.enemy = new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 20, 2f, 1.2f, 3f, new float[] {1f, 1.8f});
     }
 
     @Override
@@ -56,8 +61,19 @@ public class Main implements ApplicationListener {
         this.playerBatch.setProjectionMatrix(this.worldViewport.getCamera().view);
         this.playerBatch.begin();
         this.player.updatePlayer(dt, worldViewport, worldSize,
-            this.playerBatch, null);
+            this.playerBatch);
         this.playerBatch.end();
+
+        this.enemyBatch.setProjectionMatrix(this.worldViewport.getCamera().view);
+        this.enemyBatch.begin();
+        this.enemy.updateEnemy(dt, worldSize, enemyBatch, playerPose);
+        this.enemyBatch.end();
+
+        backgroundRenderer.begin(ShapeType.Line);
+        backgroundRenderer.setColor(dt, 1, dt, dt);
+        backgroundRenderer.polygon(this.enemy.enemyHitBox.colliderPoly.getTransformedVertices());
+        backgroundRenderer.polygon(this.player.playerHitBox.colliderPoly.getTransformedVertices());
+        backgroundRenderer.end();
     }
 
     @Override
