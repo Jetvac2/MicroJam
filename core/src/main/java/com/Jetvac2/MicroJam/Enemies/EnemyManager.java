@@ -43,15 +43,15 @@ public class EnemyManager {
             BaseEnemy enemy; 
             switch (tier) {
                 case 1:
-                    enemy = new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 15, 1f, 1.2f, 10f, 3, spawnPosition);
+                    enemy = new BaseEnemy("Tier1",
+                        new String[] {"Sprites/Enemies/Tier1/EnemySpriteBase.png", "Sprites/Enemies/Tier1/EnemySprite3.png"},
+                        new float[][] {new float[] {.25f, .25f}, new float[] {.25f, .25f}},
+                        30, 1f, 1.2f, 10f, 3, spawnPosition);
                     //allowedTier += .25f;
                     break;
-                case 2:
-                    enemy = new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 20, 2f, 1.2f, 5f, 5, spawnPosition);
-                    //allowedTier += .3f;
-                    break;
+              
                 default:
-                    enemy = new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 20, 2f, 1.2f, 5f, 5, spawnPosition);
+                    enemy = null; //new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 20, 2f, 1.2f, 5f, 5, spawnPosition);
             }
             enemyList.add(enemy);
         }

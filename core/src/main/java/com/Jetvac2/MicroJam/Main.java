@@ -59,7 +59,6 @@ public class Main implements ApplicationListener {
     public void render() {
         float dt = Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(Color.BLACK);
-        System.out.println(dt);
         float[] worldSize = new float[] {this.worldViewport.getWorldWidth(), this.worldViewport.getWorldHeight()};
         this.worldViewport.apply();
         float[] playerPose = this.player.getPlayerPose();
