@@ -2,6 +2,7 @@ package com.Jetvac2.MicroJam.Enemies;
 
 import java.util.ArrayList;
 
+import com.Jetvac2.MicroJam.Player.ChroniteManager;
 import com.Jetvac2.MicroJam.Player.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -11,20 +12,18 @@ public class EnemyManager {
     private static double enemySpawnInterval = 1500;
     private static double enemySpawnNext = 0;
     private static float allowedTier = 1;
-    
-    public EnemyManager() {
-        
-    }
 
     public static void updateEnemies(float dt, float[] worldSize, SpriteBatch spriteBatch, float[] playerPosition, float[] playerSize) {
         spawnEnemies(dt, worldSize, playerPosition, playerSize);
         for(int i = 0; i < enemyList.size(); i++) {
             BaseEnemy enemy = enemyList.get(i);
-            enemy.updateEnemy(dt, worldSize, spriteBatch, playerPosition, playerSize);
             if(enemy.HP <= 0) {
-                Player.numChronite = Math.min(Player.maxChronite, Player.numChronite + enemy.droppedChronite);
+                ChroniteManager.spawnChronite(enemy.droppedChronite, enemy.getEnemyPose());
                 enemy.enemyHitBox.active = false;
                 enemyList.remove(i);
+                i-=1;
+            } else {
+                enemy.updateEnemy(dt, worldSize, spriteBatch, playerPosition, playerSize);
             }
         }
     }
@@ -44,15 +43,15 @@ public class EnemyManager {
             BaseEnemy enemy; 
             switch (tier) {
                 case 1:
-                    enemy = new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 15, 1f, 1.2f, 10f, 5f, spawnPosition);
+                    enemy = new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 15, 1f, 1.2f, 10f, 3, spawnPosition);
                     //allowedTier += .25f;
                     break;
                 case 2:
-                    enemy = new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 20, 2f, 1.2f, 5f, 5f, spawnPosition);
+                    enemy = new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 20, 2f, 1.2f, 5f, 5, spawnPosition);
                     //allowedTier += .3f;
                     break;
                 default:
-                    enemy = new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 20, 2f, 1.2f, 5f, 5f, spawnPosition);
+                    enemy = new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 20, 2f, 1.2f, 5f, 5, spawnPosition);
             }
             enemyList.add(enemy);
         }

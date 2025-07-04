@@ -24,12 +24,12 @@ public class BaseEnemy {
     private float maxHP;
     private float speed;
     private float hpSpeedMult;
-    public float droppedChronite;
+    public int droppedChronite;
     private float[] spawnPosition;
     private float maxSpeedMult = 1.5f;
 
     // TODO: Add argumetns for partical effects for taking damage and for dieing. 
-    public BaseEnemy(String enemyType, String textureFile, float HP, float speed, float hpSpeedMult, float chroniteDamage, float droppedChronite, float[] spawnPosition) {
+    public BaseEnemy(String enemyType, String textureFile, float HP, float speed, float hpSpeedMult, float chroniteDamage, int droppedChronite, float[] spawnPosition) {
         this.enemyTex = new Texture(textureFile);
         this.enemySprite = new Sprite(this.enemyTex);
         this.enemySprite.setSize(.25f, .25f);
@@ -102,7 +102,6 @@ public class BaseEnemy {
                 } else if(collider.name.equals("Bullet")) {
                     if(Intersector.overlapConvexPolygons(this.enemyHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
                         this.HP -= collider.data[0];
-                        System.out.println(HP);
                     }
                 }
             }

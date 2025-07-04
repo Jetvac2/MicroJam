@@ -67,11 +67,10 @@ public class Player {
         if(numChronite - chroniteLossPerSecond * dt > 1) {
             numChronite -= chroniteLossPerSecond * dt;
         } else {
-            numChronite = 20;
+            this.playerSprite.setColor(1, 0, 0, 1);
             Globals.gameGoing = false;
         }
         
-        System.out.println(numChronite);
         input(dt, worldViewport);
         logic(dt, worldViewport);
         render(dt, worldSize, spriteBatch);
@@ -184,7 +183,6 @@ public class Player {
             if(collider.active) {
                 if(collider.name.equals("Tier1")) {
                     if(Intersector.overlapConvexPolygons(this.playerHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
-                    System.out.println("Player hit");
                     Globals.canHitPlayer = false;
                     }
                 } 
@@ -200,6 +198,7 @@ public class Player {
             if(bullet.isDead) {
                 bullet.collider.active = false;
                 this.bulletList.remove(i);
+                i-=1;
             } else {
                 this.bulletList.get(i).updateBullet(dt, spriteBatch);
             }
@@ -218,9 +217,8 @@ public class Player {
         if (this.fireCooldownEndTime < System.currentTimeMillis()) {
             this.fireCooldownEndTime = System.currentTimeMillis() + this.fireCooldown;
             if(numChronite - bulletCost>= 1) {
-                numChronite -= - bulletCost;
+                numChronite -= bulletCost;
             } else {
-                numChronite = 20;
                 Globals.gameGoing = false;
             }
             Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
