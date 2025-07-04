@@ -26,6 +26,7 @@ public class BaseEnemy {
     private float hpSpeedMult;
     public float droppedChronite;
     private float[] spawnPosition;
+    private float maxSpeedMult = 1.5f;
 
     // TODO: Add argumetns for partical effects for taking damage and for dieing. 
     public BaseEnemy(String enemyType, String textureFile, float HP, float speed, float hpSpeedMult, float chroniteDamage, float droppedChronite, float[] spawnPosition) {
@@ -76,7 +77,8 @@ public class BaseEnemy {
             xSpeed = dx * scale;
             ySpeed = dy * scale;
         }
-        this.enemySprite.translate(xSpeed * ((HP/maxHP) * hpSpeedMult * dt), ySpeed * ((HP/maxHP) * hpSpeedMult) * dt);
+        this.enemySprite.translate(xSpeed * (Math.min((maxHP/HP * hpSpeedMult), this.maxSpeedMult) * dt),
+            ySpeed * (Math.min((maxHP/HP * hpSpeedMult), this.maxSpeedMult) * dt));
         float targetRotation = (float)Math.toDegrees(MathUtils.atan2(dy, dx)) - 90;
         float lerpFactor = lerpConstant * dt;
         float lerpedAngle = MathUtils.lerpAngleDeg(enemySprite.getRotation(), targetRotation, lerpFactor);

@@ -9,6 +9,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
@@ -24,7 +25,8 @@ public class Player {
     public Collider playerHitBox;
     private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
 
-    private float[] velocity = new float[] {0f, 0f};          
+    private float[] velocity = new float[] {0f, 0f};  
+    private Vector2 movementDir;        
     private float acceleration = 5f;                         
     private float deceleration = 20f;
     private float maxSpeed = 5f;
@@ -116,23 +118,44 @@ public class Player {
             velocity[1] *= scale;
         }
 
-        // Dash?
-
         // Slow Time and AOE
-
-        // Basic Ranged Attack
 
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT) ||
             Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.R)) {
             spawnBullet(dt, worldViewport);
         }
 
+        movementDir = new Vector2(velocity[0], velocity[1]);
+        if (movementDir.len2() > 0.0001f) {
+            movementDir.nor(); // normalize only if moving
+        }
+
+
         playerSprite.translate(velocity[0] * dt, velocity[1] * dt);
     }
 
     private void logic(float dt, Viewport worldViewport) {
-        float[] playerCenterPosition = new float[] {playerSprite.getX() + playerSprite.getWidth()/2, playerSprite.getY() + playerSprite.getHeight()/2};
-        worldViewport.getCamera().position.lerp(new Vector3(playerCenterPosition[0], playerCenterPosition[1], 0), 0.25f);
+        float playerX = playerSprite.getX() + playerSprite.getWidth() / 2f;
+        float playerY = playerSprite.getY() + playerSprite.getHeight() / 2f;
+        Vector3 playerCenter = new Vector3(playerX, playerY, 0);
+
+        // Get current movement direction
+        Vector2 movementDir = new Vector2(velocity[0], velocity[1]);
+        Vector2 offset = new Vector2(movementDir).nor().scl((float)-Math.max(Math.sqrt((double)movementDir.len2()/5f), .1)).scl(.05f);
+    
+        Vector3 cameraTarget = new Vector3(playerX + offset.x, playerY + offset.y, 0);
+        worldViewport.getCamera().position.set(cameraTarget);
+        worldViewport.getCamera().update();
+
+
+        /*float[] playerCenterPosition = new float[] {playerSprite.getX() + playerSprite.getWidth()/2, playerSprite.getY() + playerSprite.getHeight()/2};
+        Vector3 playerPoseVec = new Vector3(playerCenterPosition[0], playerCenterPosition[1], 0);
+        if(worldViewport.getCamera().position.dst(playerPoseVec) < .1f) {
+            worldViewport.getCamera().position.lerp(playerPoseVec, .1f);
+        } else {
+            worldViewport.getCamera().position.lerp(playerPoseVec, 1f);
+        }*/
+        
         
         this.playerHitBox.colliderPoly.setPosition(playerSprite.getX(), playerSprite.getY());
         this.playerHitBox.colliderPoly.setVertices(new float[]{
