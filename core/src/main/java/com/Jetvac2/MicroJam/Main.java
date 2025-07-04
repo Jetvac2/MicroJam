@@ -58,6 +58,7 @@ public class Main implements ApplicationListener {
     @Override
     public void render() {
         float dt = Gdx.graphics.getDeltaTime();
+        System.out.println(dt);
         ScreenUtils.clear(Color.BLACK);
         float[] worldSize = new float[] {this.worldViewport.getWorldWidth(), this.worldViewport.getWorldHeight()};
         this.worldViewport.apply();

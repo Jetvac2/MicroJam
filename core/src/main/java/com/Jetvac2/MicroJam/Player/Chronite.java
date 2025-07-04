@@ -3,6 +3,8 @@ package com.Jetvac2.MicroJam.Player;
 import com.Jetvac2.MicroJam.Util.Collider;
 import com.Jetvac2.MicroJam.Util.Globals;
 import com.Jetvac2.MicroJam.Util.Utils;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -22,6 +24,7 @@ public class Chronite {
     private int currentColorIndex = (int)(Math.random() * 2);
     private float degreesPerSecond = (int)(Math.random() * 360) - 180;
     public float age;
+    private Sound chronitePickUpSoundEffect;
     public Chronite(float[] spawnOrgin) {
         this.tex = new Texture("Sprites/ChroniteShard.png");
         this.sprite = new Sprite(tex);
@@ -44,6 +47,7 @@ public class Chronite {
             new float[] {.506f, .129f, .8f, .9f},
             new float[] {.606f, .529f, 1f, 1f}
         };
+        this.chronitePickUpSoundEffect = Gdx.audio.newSound(Gdx.files.local("SoundEffects/ChronitePickUpSoundEffect.wav"));
     }
 
     public void updateChronite(float dt, SpriteBatch spriteBatch) {
@@ -77,6 +81,7 @@ public class Chronite {
                     if(Intersector.overlapConvexPolygons(this.collider.colliderPoly, collider.colliderPoly)){
                         collected = true;
                         Player.numChronite = Math.min(Player.maxChronite, Player.numChronite+2);
+                        this.chronitePickUpSoundEffect.play(Globals.soundEffectAudioLevel);
                     }
                 } 
             }
