@@ -27,6 +27,7 @@ public class BaseEnemy {
     public int droppedChronite;
     private float[] spawnPosition;
     private float minSpeedMult = .5f;
+    public boolean dirty = false;
 
     // TODO: Add argumetns for partical effects for taking damage and for dieing. 
     public BaseEnemy(String enemyType, String[] textureFiles, float[][] scale, float HP, float speed, float hpSpeedMult, float chroniteDamage, int droppedChronite, float[] spawnPosition) {
@@ -72,32 +73,36 @@ public class BaseEnemy {
 
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-        float separationX = .5f;
-        float separationY = .5f;
-        float separationRadius = .5f; // Adjust based on enemy size
+        float attackRadius = 0.3f; // How close enemies must be to attack
+        boolean isAttacking = distance < attackRadius;
 
-        for (Collider other : Globals.colliders) {
-            if (other == this.enemyHitBox || !other.name.equals(this.enemyHitBox.name)) continue;
+        Vector2 separation = new Vector2();
 
-            float ox = other.colliderPoly.getX();
-            float oy = other.colliderPoly.getY();
-            float ex = enemyPose[0];
-            float ey = enemyPose[1];
+        if (!isAttacking) {
+            float separationRadius = .5f;
+            for (Collider other : Globals.colliders) {
+                if (other == this.enemyHitBox || !other.name.equals(this.enemyHitBox.name)) continue;
 
-            float distSq = (ox - ex) * (ox - ex) + (oy - ey) * (oy - ey);
-            if (distSq < separationRadius * separationRadius && distSq > 0.0001f) {
-                float dist = (float) Math.sqrt(distSq);
-                float push = (separationRadius - dist) / separationRadius;
-                separationX += (ex - ox) / dist * push;
-                separationY += (ey - oy) / dist * push;
+                float ox = other.colliderPoly.getX();
+                float oy = other.colliderPoly.getY();
+                float ex = enemyPose[0];
+                float ey = enemyPose[1];
+
+                float distSq = (ox - ex) * (ox - ex) + (oy - ey) * (oy - ey);
+                if (distSq < separationRadius * separationRadius && distSq > 0.0001f) {
+                    float dist = (float) Math.sqrt(distSq);
+                    float push = (separationRadius - dist) / separationRadius;
+                    separation.add((ex - ox) / dist * push, (ey - oy) / dist * push);
+                }
             }
         }
 
-        float scale = speed / distance;
-        float xSpeed = dx * scale * Math.max((HP / maxHP * hpSpeedMult), this.minSpeedMult)+ separationX;
-        float ySpeed = dy * scale * Math.max((HP / maxHP * hpSpeedMult), this.minSpeedMult) + separationY;
-        Vector2 move = new Vector2(xSpeed, ySpeed).nor().scl(speed);
-        enemySprites[0].translate(move.x * dt, move.y * dt);
+        Vector2 toPlayer = new Vector2(dx, dy).nor().scl(speed);
+        Vector2 finalVelocity = toPlayer.add(separation).nor().scl(speed);
+        finalVelocity.x *=  Math.max((HP / maxHP * hpSpeedMult), this.minSpeedMult);
+        finalVelocity.y *=  Math.max((HP / maxHP * hpSpeedMult), this.minSpeedMult);
+  
+        enemySprites[0].translate(finalVelocity.x * dt, finalVelocity.y * dt);
 
         float targetRotation = (float)Math.toDegrees(MathUtils.atan2(dy, dx)) - 90;
         float lerpFactor = lerpConstant * dt;
@@ -118,9 +123,10 @@ public class BaseEnemy {
             if(collider.active) {
                 if(collider.name.equals("Player")) {
                     if(Intersector.overlapConvexPolygons(this.enemyHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
+                        this.dirty = true;
                     }
                 } else if(collider.name.equals("Bullet")) {
-                    if(Intersector.overlapConvexPolygons(this.enemyHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
+                    if(Intersector.overlapConvexPolygons(this.enemyHitBox.colliderPoly, collider.colliderPoly)){
                         this.HP -= collider.data[0];
                     }
                 }

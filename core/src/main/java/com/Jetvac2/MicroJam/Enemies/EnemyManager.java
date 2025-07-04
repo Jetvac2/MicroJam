@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import com.Jetvac2.MicroJam.Player.ChroniteManager;
 import com.Jetvac2.MicroJam.Player.Player;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class EnemyManager {
     private static ArrayList<BaseEnemy> enemyList = new ArrayList<BaseEnemy>();
-    private static double enemySpawnInterval = 3000;
+    private static double enemySpawnInterval = 750;
     private static double enemySpawnNext = 0;
     private static float allowedTier = 1;
     private static int maxEnemyCount = 20;
@@ -18,8 +19,10 @@ public class EnemyManager {
         spawnEnemies(dt, worldSize, playerPosition, playerSize);
         for(int i = 0; i < enemyList.size(); i++) {
             BaseEnemy enemy = enemyList.get(i);
-            if(enemy.HP <= 0) {
-                ChroniteManager.spawnChronite(enemy.droppedChronite, enemy.getEnemyPose());
+            if(enemy.HP <= 0 || enemy.dirty) {
+                if(!enemy.dirty) {
+                    ChroniteManager.spawnChronite(enemy.droppedChronite, enemy.getEnemyPose());
+                }
                 enemy.enemyHitBox.active = false;
                 enemyList.remove(i);
                 i-=1;
@@ -30,36 +33,73 @@ public class EnemyManager {
     }
 
     private static void spawnEnemies(float dt, float[] worldSize, float[] playerPosition, float[] playerSize) {
-        if(System.currentTimeMillis() > enemySpawnNext) {
-            if(enemyList.size() >= maxEnemyCount) {
-                enemyList.remove(0);
-            }
-            enemySpawnNext = System.currentTimeMillis() + enemySpawnInterval;
-            float spawnDistence = (worldSize[0] + worldSize[1]) / 2;
-            float spawnAngle = (int)(Math.random() * 361);
-            float spawnX = (float)Math.cos(Math.toRadians((double)spawnAngle)) * spawnDistence;
-            float spawnY = (float)Math.sin(Math.toRadians((double)spawnAngle)) * spawnDistence;
-            spawnX += playerPosition[0] + playerSize[0]/2;
-            spawnY += playerPosition[1] + playerSize[1]/2;
-            float[] spawnPosition = new float[] {spawnX, spawnY};
-
-            int tier = (int)(Math.random() * (int)(allowedTier-1)) + 1;
-            BaseEnemy enemy; 
-            switch (tier) {
-                case 1:
-                    enemy = new BaseEnemy("Tier1",
-                        new String[] {"Sprites/Enemies/Tier1/EnemySpriteBase.png", "Sprites/Enemies/Tier1/EnemySprite3.png"},
-                        new float[][] {new float[] {.25f, .25f}, new float[] {.25f, .25f}},
-                        30, 1f, 1.2f, 10f, 3, spawnPosition);
-                    //allowedTier += .25f;
-                    break;
-              
-                default:
-                    enemy = null; //new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 20, 2f, 1.2f, 5f, 5, spawnPosition);
-            }
-            enemyList.add(enemy);
+    if (System.currentTimeMillis() > enemySpawnNext) {
+        if (enemyList.size() >= maxEnemyCount) {
+            enemyList.remove(0);
         }
+
+        enemySpawnNext = System.currentTimeMillis() + enemySpawnInterval;
+
+        // Divide the circle into sectors
+        int numSectors = 8;
+        int[] sectorCounts = new int[numSectors];
+
+        float playerCenterX = playerPosition[0] + playerSize[0] / 2f;
+        float playerCenterY = playerPosition[1] + playerSize[1] / 2f;
+
+        // Count enemies in each sector
+        for (BaseEnemy enemy : enemyList) {
+            float[] pos = enemy.getEnemyPose();
+            float angle = MathUtils.atan2(pos[1] - playerCenterY, pos[0] - playerCenterX) * MathUtils.radiansToDegrees;
+            if (angle < 0) angle += 360;
+            int sector = (int)(angle / (360f / numSectors));
+            sectorCounts[sector]++;
+        }
+
+        // Find the least populated sector
+        int bestSector = 0;
+        int minCount = sectorCounts[0];
+        for (int i = 1; i < numSectors; i++) {
+            if (sectorCounts[i] < minCount) {
+                minCount = sectorCounts[i];
+                bestSector = i;
+            }
+        }
+
+        // Pick a random angle within that sector
+        float sectorAngleSize = 360f / numSectors;
+        float spawnAngle = bestSector * sectorAngleSize + MathUtils.random(sectorAngleSize);
+
+        // Spawn at a distance from the player
+        float spawnDistance = (worldSize[0] + worldSize[1]) / 2f;
+        float spawnX = MathUtils.cosDeg(spawnAngle) * spawnDistance + playerCenterX;
+        float spawnY = MathUtils.sinDeg(spawnAngle) * spawnDistance + playerCenterY;
+        float[] spawnPosition = new float[] {spawnX, spawnY};
+
+        // Create the enemy
+        int tier = (int)(Math.random() * (int)(allowedTier - 1)) + 1;
+        BaseEnemy enemy;
+        switch (tier) {
+            case 1:
+                enemy = new BaseEnemy("Tier1",
+                    new String[] {
+                        "Sprites/Enemies/Tier1/EnemySpriteBase.png",
+                        "Sprites/Enemies/Tier1/EnemySprite3.png"
+                    },
+                    new float[][] {
+                        new float[] {.25f, .25f},
+                        new float[] {.25f, .25f}
+                    },
+                    30, 1f, 1.2f, 10f, 3, spawnPosition);
+                break;
+            default:
+                enemy = null;
+        }
+        enemyList.add(enemy);
+        
     }
+}
+
 
   
 }
