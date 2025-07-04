@@ -20,8 +20,10 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class Player {
-    private Texture playerTex;
     private Sprite playerSprite;
+    private Sprite spriteLayer2;
+    private Sprite spriteLayer3;
+    private Sprite spriteLayer4;
     public Collider playerHitBox;
     private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
 
@@ -45,11 +47,22 @@ public class Player {
     private float bulletCost = 2f;
     private float chroniteLossPerSecond = 3;
 
+    private float[] spriteLayer4BaseSize;
+
 
     public Player() {
-        this.playerTex = new Texture("Sprites/PlayerTex.png");
-        this.playerSprite = new Sprite(this.playerTex);
+        this.playerSprite = new Sprite(new Texture("Sprites/Player/PlayerTexBase.png"));
+        this.spriteLayer2 = new Sprite(new Texture("Sprites/Player/PlayerTex2.png"));
+        this.spriteLayer3 = new Sprite(new Texture("Sprites/Player/PlayerTex3.png"));
+        this.spriteLayer4 = new Sprite(new Texture("Sprites/Player/PlayerTex4.png"));
         this.playerSprite.setSize(.25f, .25f);
+        this.spriteLayer2.setSize(.25f, .25f);
+        this.spriteLayer3.setSize(.23f, .23f);
+        this.spriteLayer4BaseSize = new float[] {.15f, .15f};
+        this.spriteLayer4.setSize(this.spriteLayer4BaseSize[0], this.spriteLayer4BaseSize[1]);
+        this.spriteLayer2.setOriginCenter();
+        this.spriteLayer3.setOriginCenter();
+        this.spriteLayer4.setOriginCenter();
         this.playerHitBox = new Collider(new Polygon(new float[]{
             0f, 0f,
             this.playerSprite.getWidth(), 0f,
@@ -74,8 +87,6 @@ public class Player {
         input(dt, worldViewport);
         logic(dt, worldViewport);
         render(dt, worldSize, spriteBatch);
-        
-
     }
 
     private void input(float dt, Viewport worldViewport) {
@@ -136,7 +147,6 @@ public class Player {
     private void logic(float dt, Viewport worldViewport) {
         float playerX = playerSprite.getX() + playerSprite.getWidth() / 2f;
         float playerY = playerSprite.getY() + playerSprite.getHeight() / 2f;
-        Vector3 playerCenter = new Vector3(playerX, playerY, 0);
 
         // Get current movement direction
         Vector2 movementDir = new Vector2(velocity[0], velocity[1]);
@@ -145,17 +155,10 @@ public class Player {
         Vector3 cameraTarget = new Vector3(playerX + offset.x, playerY + offset.y, 0);
         worldViewport.getCamera().position.set(cameraTarget);
         worldViewport.getCamera().update();
-
-
-        /*float[] playerCenterPosition = new float[] {playerSprite.getX() + playerSprite.getWidth()/2, playerSprite.getY() + playerSprite.getHeight()/2};
-        Vector3 playerPoseVec = new Vector3(playerCenterPosition[0], playerCenterPosition[1], 0);
-        if(worldViewport.getCamera().position.dst(playerPoseVec) < .1f) {
-            worldViewport.getCamera().position.lerp(playerPoseVec, .1f);
-        } else {
-            worldViewport.getCamera().position.lerp(playerPoseVec, 1f);
-        }*/
         
-        
+        this.spriteLayer2.setPosition(playerSprite.getX(), playerSprite.getY());
+        this.spriteLayer3.setPosition(playerSprite.getX() + playerSprite.getWidth()/2 - this.spriteLayer3.getWidth()/2, playerSprite.getY() + playerSprite.getHeight()/2 - this.spriteLayer3.getHeight()/2);
+        this.spriteLayer4.setPosition(playerSprite.getX() + playerSprite.getWidth()/2 - this.spriteLayer4.getWidth()/2, playerSprite.getY() + playerSprite.getHeight()/2 - this.spriteLayer4.getHeight()/2);
         this.playerHitBox.colliderPoly.setPosition(playerSprite.getX(), playerSprite.getY());
         this.playerHitBox.colliderPoly.setVertices(new float[]{
             0f, 0f,
@@ -191,8 +194,20 @@ public class Player {
     }
 
     private void render(float dt, float[] worldSize, SpriteBatch spriteBatch) {
-        this.playerSprite.setColor(0f, .443f, .663f, 1f);
+        float chroniteRatioSmall = (numChronite / maxChronite);
+        float chroniteRatioLarge = (maxChronite / numChronite);
+        this.spriteLayer2.rotate(90 * chroniteRatioSmall * dt);
+        this.spriteLayer3.rotate(-120 * chroniteRatioSmall * dt );
+        this.spriteLayer4.setSize(this.spriteLayer4BaseSize[0] * (numChronite / maxChronite), this.spriteLayer4BaseSize[1] * (numChronite / maxChronite));
+        this.playerSprite.setColor(.2f * chroniteRatioLarge - .4f, .4f * chroniteRatioSmall + .2f, .4f * chroniteRatioSmall + .2f , 1f);
+        this.spriteLayer2.setColor(.2f * chroniteRatioLarge - .2f, .5f * chroniteRatioSmall + .3f, .6f * chroniteRatioSmall + .4f , 1f);
+        this.spriteLayer3.setColor(.2f * chroniteRatioLarge - .1f, .6f * chroniteRatioSmall + .4f, .6f * chroniteRatioSmall + .4f , 1f);
+        this.spriteLayer4.setColor(1, 1, 1, 1f * chroniteRatioSmall + .25f);
+
         this.playerSprite.draw(spriteBatch);
+        this.spriteLayer2.draw(spriteBatch);
+        this.spriteLayer3.draw(spriteBatch);
+        this.spriteLayer4.draw(spriteBatch);
         for(int i = 0; i < bulletList.size(); i++) {
             Bullet bullet = this.bulletList.get(i);
             if(bullet.isDead) {

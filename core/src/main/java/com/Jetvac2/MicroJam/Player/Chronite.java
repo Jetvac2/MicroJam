@@ -39,9 +39,9 @@ public class Chronite {
         this.sprite.setPosition(spawnPoint[0], spawnPoint[1]);
         this.collider.colliderPoly.setPosition(this.sprite.getX(), this.sprite.getY());
         colors = new float[][] {
-            new float[] {.506f, .129f, 1f, .6f},
+            new float[] {.506f, .129f, 1f, .8f},
             new float[] {.506f, .129f, .8f, .9f},
-            new float[] {.606f, .529f, 1f, .8f}
+            new float[] {.606f, .529f, 1f, 1f}
         };
     }
 

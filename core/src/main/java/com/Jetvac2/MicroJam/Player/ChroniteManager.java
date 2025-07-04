@@ -9,15 +9,21 @@ import com.badlogic.gdx.math.Polygon;
 
 public class ChroniteManager {
     private static ArrayList<Chronite> chroniteList = new ArrayList<Chronite>();
-   
+    private static int toSpawn = 0;
+    private static float[] spawnPoint;
+    private static int spawnPerFrame = 1;
     public static void spawnChronite(int number, float[] spawnOrgin) {
         number += ((int)(Math.random() * (number-1) * 2)) - (number-1);
-        for(int i = 0; i < number; i++) {
-            chroniteList.add(new Chronite(spawnOrgin));
-        }
+        toSpawn += number;
+        spawnPoint = spawnOrgin;
     }
 
     public static void updateChronite(float dt, SpriteBatch spriteBatch) {
+        for(int i = 0; i < Math.min(spawnPerFrame, toSpawn); i++) {
+            toSpawn--;
+            chroniteList.add(new Chronite(spawnPoint));
+        }
+
         for(int i = 0; i < chroniteList.size(); i++) {
             Chronite chronite = chroniteList.get(i);
             if(chronite.collected) {
