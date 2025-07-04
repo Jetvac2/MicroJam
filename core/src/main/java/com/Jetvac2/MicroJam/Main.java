@@ -2,6 +2,7 @@ package com.Jetvac2.MicroJam;
 
 import com.Jetvac2.MicroJam.Enemies.BaseEnemy;
 import com.Jetvac2.MicroJam.Enemies.EnemyManager;
+import com.Jetvac2.MicroJam.Player.Chronite;
 import com.Jetvac2.MicroJam.Player.Player;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -25,6 +26,10 @@ public class Main implements ApplicationListener {
     private SpriteBatch enemyBatch;
     private Player player;
     private FitViewport worldViewport;
+    Chronite chronite1;
+    Chronite chronite2;
+    Chronite chronite3;
+    Chronite chronite4;
 
     @Override
     public void create() {
@@ -33,6 +38,11 @@ public class Main implements ApplicationListener {
         this.playerBatch = new SpriteBatch();
         this.enemyBatch = new SpriteBatch();
         this.player = new Player();
+        chronite1 = new Chronite(new float[]{.5f, .5f});
+        chronite2 = new Chronite(new float[]{.5f, .5f});
+        chronite3 = new Chronite(new float[]{.5f, .5f});
+        chronite4 = new Chronite(new float[]{.5f, .5f});
+
     }
 
     @Override
@@ -65,7 +75,11 @@ public class Main implements ApplicationListener {
 
         this.enemyBatch.setProjectionMatrix(this.worldViewport.getCamera().view);
         this.enemyBatch.begin();
-        EnemyManager.updateEnemies(dt, worldSize, enemyBatch, playerPose, playerSize);
+        //EnemyManager.updateEnemies(dt, worldSize, enemyBatch, playerPose, playerSize);
+        this.chronite1.updateChronite(dt, enemyBatch);
+        this.chronite2.updateChronite(dt, enemyBatch);
+        this.chronite3.updateChronite(dt, enemyBatch);
+        this.chronite4.updateChronite(dt, enemyBatch);
         this.enemyBatch.end();
 
         backgroundRenderer.begin(ShapeType.Line);
