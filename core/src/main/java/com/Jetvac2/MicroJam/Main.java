@@ -37,7 +37,7 @@ public class Main implements ApplicationListener {
     @Override
     public void create() {
         Gdx.graphics.setVSync(true);
-        Gdx.graphics.setForegroundFPS(30);
+        Gdx.graphics.setForegroundFPS(120);
         this.worldViewport = new FitViewport(2f, 2f, new OrthographicCamera());
         this.backgroundRenderer = new ShapeRenderer();
         this.playerBatch = new SpriteBatch();

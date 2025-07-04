@@ -29,17 +29,16 @@ public class Player {
     private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
 
     private float[] velocity = new float[] {0f, 0f};  
-    private Vector2 movementDir;        
     private float acceleration = 5f;                         
     private float deceleration = 20f;
-    private float maxSpeed = 5f;
+    private float maxSpeed = 2.5f;
 
     private boolean setPlayerStartPosition = true;
 
     public static float maxChronite = 21;
     public static float numChronite = 21;
 
-    private double IFrameTime = 250;
+    private double IFrameTime = 670;
     private double IFrameEndTime = -1;
 
     private double fireCooldown = 700;
@@ -51,6 +50,9 @@ public class Player {
     private float[] spriteLayer4BaseSize;
 
     private Sound bulletFireSound;
+    private Sound playerHitSound;
+    private float trueMaxSpeed = 4f;
+    private float alpha = 1f;
 
     public Player() {
         this.playerSprite = new Sprite(new Texture("Sprites/Player/PlayerTexBase.png"));
@@ -78,6 +80,7 @@ public class Player {
         Globals.colliders.add(this.playerHitBox);
 
         this.bulletFireSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/bulletFire.wav"));
+        this.playerHitSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/PlayerHit.wav"));
     }
 
     public void updatePlayer(float dt, Viewport worldViewport, float[] worldSize, SpriteBatch spriteBatch) {
@@ -88,7 +91,6 @@ public class Player {
         if(numChronite - chroniteLossPerSecond * dt > 1) {
             numChronite -= chroniteLossPerSecond * dt;
         } else {
-            this.playerSprite.setColor(1, 0, 0, 1);
             Globals.gameGoing = false;
         }
         
@@ -129,12 +131,7 @@ public class Player {
             }
         }
 
-        float speed = (float) Math.sqrt(velocity[0] * velocity[0] + velocity[1] * velocity[1]);
-        if (speed > maxSpeed) {
-            float scale = maxSpeed / speed;
-            velocity[0] *= scale;
-            velocity[1] *= scale;
-        }
+        
 
         // Slow Time and AOE
 
@@ -143,16 +140,21 @@ public class Player {
             spawnBullet(dt, worldViewport);
         }
 
-        movementDir = new Vector2(velocity[0], velocity[1]);
-        if (movementDir.len2() > 0.0001f) {
-            movementDir.nor(); // normalize only if moving
+        Vector2 velocityVec = new Vector2(velocity[0], velocity[1]);
+
+        if (Math.abs(velocityVec.len()) > maxSpeed) {
+            velocityVec.nor().scl(maxSpeed);
         }
-        float pixelsPerUnit = Gdx.graphics.getWidth() / worldViewport.getWorldWidth();
-        float newX = velocity[0] * dt + this.playerSprite.getX();
-        float newY = velocity[1] * dt + this.playerSprite.getY();
-        newX = Math.round(newX * pixelsPerUnit) / pixelsPerUnit;
-        newY = Math.round(newY * pixelsPerUnit) / pixelsPerUnit;
-        playerSprite.setPosition(newX, newY);
+
+        float chroniteRatio = maxChronite / numChronite;
+        Vector2 scaledVec = new Vector2(velocityVec).scl(chroniteRatio);
+        if (Math.abs(scaledVec.len()) > trueMaxSpeed) {
+            scaledVec.nor().scl(trueMaxSpeed);
+        }
+
+        System.out.println(scaledVec);
+        playerSprite.translate(scaledVec.x * dt, scaledVec.y * dt);
+
     }
 
     private void logic(float dt, Viewport worldViewport) {
@@ -162,6 +164,9 @@ public class Player {
         // Get current movement direction
         Vector2 movementDir = new Vector2(velocity[0], velocity[1]);
         Vector2 offset = new Vector2(movementDir).nor().scl((float)-Math.max(Math.sqrt((double)movementDir.len2()/5f), .1)).scl(.05f);
+        if(Math.abs(offset.len()) > .15f) {
+            offset.nor().scl(.15f);
+        }
         float pixelsPerUnit = Gdx.graphics.getWidth() / worldViewport.getWorldWidth();
         Vector3 cameraTarget = new Vector3(playerX + offset.x, playerY + offset.y, 0);
         cameraTarget.x = Math.round(cameraTarget.x * pixelsPerUnit)/ pixelsPerUnit;
@@ -184,9 +189,14 @@ public class Player {
             if(this.IFrameEndTime == -1) {
                 this.IFrameEndTime = System.currentTimeMillis() + this.IFrameTime;
             }
+            double timeLeft = IFrameEndTime - System.currentTimeMillis();
+            float percentLeft = (float)timeLeft / (float)this.IFrameTime;
+            this.alpha = (float)Math.cos(Math.abs(percentLeft * 4 * Math.PI));
+
             if(this.IFrameEndTime < System.currentTimeMillis()) {
                 this.IFrameEndTime = -1;
                 Globals.canHitPlayer = true;
+                this.alpha = 1;
             }
     
         }
@@ -197,9 +207,10 @@ public class Player {
     private void checkCollisions() {
         for(Collider collider : Globals.colliders) {
             if(collider.active) {
-                if(collider.name.equals("Tier1")) {
+                if(collider.name.contains("Tier")) {
                     if(Intersector.overlapConvexPolygons(this.playerHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
-                    Globals.canHitPlayer = false;
+                        Globals.canHitPlayer = false;
+                        this.playerHitSound.play(Globals.soundEffectAudioLevel);
                     }
                 } 
             }
@@ -212,9 +223,9 @@ public class Player {
         this.spriteLayer2.rotate(90 * chroniteRatioSmall * dt);
         this.spriteLayer3.rotate(-120 * chroniteRatioSmall * dt );
         this.spriteLayer4.setSize(this.spriteLayer4BaseSize[0] * (numChronite / maxChronite), this.spriteLayer4BaseSize[1] * (numChronite / maxChronite));
-        this.playerSprite.setColor(.2f * chroniteRatioLarge - .4f, .4f * chroniteRatioSmall + .2f, .4f * chroniteRatioSmall + .2f , 1f);
-        this.spriteLayer2.setColor(.2f * chroniteRatioLarge - .2f, .5f * chroniteRatioSmall + .3f, .6f * chroniteRatioSmall + .4f , 1f);
-        this.spriteLayer3.setColor(.2f * chroniteRatioLarge - .1f, .6f * chroniteRatioSmall + .4f, .6f * chroniteRatioSmall + .4f , 1f);
+        this.playerSprite.setColor(.2f * chroniteRatioLarge - .4f, .4f * chroniteRatioSmall + .2f, .4f * chroniteRatioSmall + .2f , this.alpha);
+        this.spriteLayer2.setColor(.2f * chroniteRatioLarge - .2f, .5f * chroniteRatioSmall + .3f, .6f * chroniteRatioSmall + .4f , this.alpha);
+        this.spriteLayer3.setColor(.2f * chroniteRatioLarge - .1f, .6f * chroniteRatioSmall + .4f, .6f * chroniteRatioSmall + .4f , this.alpha);
         this.spriteLayer4.setColor(1, 1, 1, 1f * chroniteRatioSmall + .25f);
         
         spriteBatch.setProjectionMatrix(worldViewport.getCamera().view);

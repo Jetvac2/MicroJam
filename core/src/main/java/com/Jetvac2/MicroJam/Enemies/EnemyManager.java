@@ -13,7 +13,7 @@ public class EnemyManager {
     private static double enemySpawnInterval = 750;
     private static double enemySpawnNext = 0;
     private static float allowedTier = 1;
-    private static int maxEnemyCount = 20;
+    private static int maxEnemyCount = 10;
 
     public static void updateEnemies(float dt, float[] worldSize, SpriteBatch spriteBatch, float[] playerPosition, float[] playerSize) {
         spawnEnemies(dt, worldSize, playerPosition, playerSize);

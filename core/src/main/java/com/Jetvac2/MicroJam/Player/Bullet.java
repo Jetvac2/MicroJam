@@ -1,5 +1,7 @@
 package com.Jetvac2.MicroJam.Player;
 
+import java.util.Vector;
+
 import com.Jetvac2.MicroJam.Util.Collider;
 import com.Jetvac2.MicroJam.Util.Globals;
 import com.badlogic.gdx.Gdx;
@@ -9,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Vector2;
 
 public class Bullet {
     // More chronite = less damge longer life
@@ -23,6 +26,7 @@ public class Bullet {
     private float powerMult;
     public boolean isDead = false;
     private Sound explodingSoundEffect;
+    private float maxVelocity = 5f;
     public Bullet(float[] spawnPose, float[] velocity, float angleDeg) {
         this.texture = new Texture("Sprites/Bullet.png");
         this.sprite = new Sprite(texture);
@@ -51,7 +55,15 @@ public class Bullet {
         float power = calcPower();
         this.collider.data = new float[] {power * baseDamage};
         float[] modVelocity = new float[] {velocity[0] * power, velocity[1] * power};
-        this.sprite.translate(modVelocity[0] * dt, modVelocity[1] * dt);
+        Vector2 velocity = new Vector2(modVelocity[0], modVelocity[1]);
+        float mag = Math.abs(velocity.len());
+        float velocityScl = 1;
+        if(mag > maxVelocity) {
+            velocityScl = maxVelocity / mag;
+        }
+        velocity.scl(velocityScl);
+        velocity.scl(dt);
+        this.sprite.translate(velocity.x, velocity.y);
 
         this.collider.colliderPoly.setVertices(new float[] {
             0f, 0f,
@@ -80,6 +92,7 @@ public class Bullet {
 
     private float calcPower() {
         double timePassed = System.currentTimeMillis() - this.startTime;
+        this.sprite.setColor(1, (float)lifeTime / (float)timePassed - 1, (float)lifeTime / (float)timePassed - 1, (float)lifeTime / (float)timePassed - 1);
         if(timePassed > lifeTime) {
             this.isDead = true;
             return 0;

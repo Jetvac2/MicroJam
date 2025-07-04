@@ -101,7 +101,9 @@ public class BaseEnemy {
         Vector2 finalVelocity = toPlayer.add(separation).nor().scl(speed);
         finalVelocity.x *=  Math.max((HP / maxHP * hpSpeedMult), this.minSpeedMult);
         finalVelocity.y *=  Math.max((HP / maxHP * hpSpeedMult), this.minSpeedMult);
-  
+        if(Math.abs(finalVelocity.len()) < .74f) {
+            finalVelocity = new Vector2();
+        }
         enemySprites[0].translate(finalVelocity.x * dt, finalVelocity.y * dt);
 
         float targetRotation = (float)Math.toDegrees(MathUtils.atan2(dy, dx)) - 90;

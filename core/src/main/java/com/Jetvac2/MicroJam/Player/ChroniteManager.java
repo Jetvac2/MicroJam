@@ -12,11 +12,11 @@ public class ChroniteManager {
     private static int toSpawn = 0;
     private static float[] spawnPoint;
     private static int spawnPerFrame = 1;
-    private static float maxChroniteAge = 3f;
+    private static float maxChroniteAge = 10f;
     private static int maxChroniteNum = 40;
     public static void spawnChronite(int number, float[] spawnOrgin) {
         int numberMod = ((int)(Math.random() * 4f)) - 2;
-        toSpawn += number;
+        toSpawn += number + numberMod;
         spawnPoint = spawnOrgin;
     }
 
