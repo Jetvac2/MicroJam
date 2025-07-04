@@ -12,8 +12,9 @@ public class ChroniteManager {
     private static int toSpawn = 0;
     private static float[] spawnPoint;
     private static int spawnPerFrame = 1;
+    private static float maxChroniteAge = 3f;
     public static void spawnChronite(int number, float[] spawnOrgin) {
-        number += ((int)(Math.random() * (number-1) * 2)) - (number-1);
+        int numberMod = ((int)(Math.random() * 4f)) - 2;
         toSpawn += number;
         spawnPoint = spawnOrgin;
     }
@@ -26,7 +27,8 @@ public class ChroniteManager {
 
         for(int i = 0; i < chroniteList.size(); i++) {
             Chronite chronite = chroniteList.get(i);
-            if(chronite.collected) {
+            chronite.age += dt;
+            if(chronite.collected || chronite.age > maxChroniteAge) {
                 chronite.collider.active = false;
                 chroniteList.remove(i);
                 i-=1;

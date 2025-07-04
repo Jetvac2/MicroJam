@@ -21,6 +21,7 @@ public class Chronite {
     private int nextColorIndex = (int)(Math.random() * 2);
     private int currentColorIndex = (int)(Math.random() * 2);
     private float degreesPerSecond = (int)(Math.random() * 360) - 180;
+    public float age;
     public Chronite(float[] spawnOrgin) {
         this.tex = new Texture("Sprites/ChroniteShard.png");
         this.sprite = new Sprite(tex);
