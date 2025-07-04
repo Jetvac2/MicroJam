@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -18,6 +19,7 @@ public class BaseEnemy {
     private Sprite enemySprite;
     public Collider enemyHitBox;
     private boolean setStartPosition = true;
+    private float lerpConstant = 5f;
     private float HP;
     private float maxHP;
     private float speed;
@@ -35,6 +37,8 @@ public class BaseEnemy {
             this.enemySprite.getWidth(), 0f,
             enemySprite.getWidth()/2, enemySprite.getHeight()
         }), enemyType);
+        this.enemySprite.setOriginCenter();
+        enemyHitBox.colliderPoly.setOrigin(enemySprite.getWidth() / 2f, enemySprite.getHeight() / 2f);
         this.HP = HP;
         this.maxHP = HP;
         this.speed = speed;
@@ -72,23 +76,34 @@ public class BaseEnemy {
             ySpeed = dy * scale;
         }
         this.enemySprite.translate(xSpeed * ((HP/maxHP) * hpSpeedMult * dt), ySpeed * ((HP/maxHP) * hpSpeedMult) * dt);
-
+        float targetRotation = (float)Math.toDegrees(MathUtils.atan2(dy, dx)) - 90;
+        float lerpFactor = lerpConstant * dt;
+        float lerpedAngle = MathUtils.lerpAngleDeg(enemySprite.getRotation(), targetRotation, lerpFactor);
+        enemySprite.setRotation(lerpedAngle);
         this.enemyHitBox.colliderPoly.setPosition(enemyPose[0], enemyPose[1]);
         this.enemyHitBox.colliderPoly.setVertices(new float[] {
             0f, 0f,
             this.enemySprite.getWidth(), 0f,
             enemySprite.getWidth()/2, enemySprite.getHeight()
         });
+        this.enemyHitBox.colliderPoly.setRotation(this.enemySprite.getRotation());
         checkCollisions();
     }
 
     private void checkCollisions() {
         for(Collider collider : Globals.colliders) {
-            if(collider.name.equals("Player")) {
-                if(Intersector.overlapConvexPolygons(this.enemyHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
-                   System.out.println("Hit Player");
+            if(collider.active) {
+                if(collider.name.equals("Player")) {
+                    if(Intersector.overlapConvexPolygons(this.enemyHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
+                    }
+                } else if(collider.name.equals("Bullet")) {
+                    if(Intersector.overlapConvexPolygons(this.enemyHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
+                        this.HP -= collider.data[0];
+                        System.out.println(HP);
+                    }
                 }
             }
+            
         }
     }
 

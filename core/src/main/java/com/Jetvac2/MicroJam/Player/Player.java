@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -21,6 +22,8 @@ public class Player {
     private Texture playerTex;
     private Sprite playerSprite;
     public Collider playerHitBox;
+    private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
+
     private float[] velocity = new float[] {0f, 0f};          
     private float acceleration = 5f;                         
     private float deceleration = 20f;
@@ -28,10 +31,16 @@ public class Player {
 
     private boolean setPlayerStartPosition = true;
 
-    public static float numChronite;
+    public static float maxChronite = 20;
+    public static float numChronite = 20;
 
-    private double IFrameTime = 250f;
+    private double IFrameTime = 250;
     private double IFrameEndTime = -1;
+
+    private double fireCooldown = 700;
+    private double fireCooldownEndTime = -1;
+    private float bulletVelocityMag = 2f;
+    private float bulletSpawnOffset = 0f;
 
     public Player() {
         this.playerTex = new Texture("Sprites/PlayerTex.png");
@@ -47,22 +56,23 @@ public class Player {
     }
 
     public void updatePlayer(float dt, Viewport worldViewport, float[] worldSize, SpriteBatch spriteBatch) {
-        System.out.println(Globals.canHitPlayer);
         if(setPlayerStartPosition) {
             this.playerSprite.setPosition(worldSize[0]/2, worldSize[1]/2);
             this.setPlayerStartPosition = false;
         }
-        input(dt);
+        input(dt, worldViewport);
         logic(dt, worldViewport);
         render(dt, worldSize, spriteBatch);
+        
+
     }
 
-    private void input(float dt) {
+    private void input(float dt, Viewport worldViewport) {
         // Base Player Movement
         // Horizontal movement
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             velocity[0] += acceleration * dt;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             velocity[0] -= acceleration * dt;
         } else {
             if (velocity[0] > 0) {
@@ -75,9 +85,9 @@ public class Player {
         }
 
         // Vertical movement
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             velocity[1] += acceleration * dt;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
             velocity[1] -= acceleration * dt;
         } else {
             if (velocity[1] > 0) {
@@ -102,13 +112,17 @@ public class Player {
 
         // Basic Ranged Attack
 
+        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT) ||
+            Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+            spawnBullet(dt, worldViewport);
+        }
+
         playerSprite.translate(velocity[0] * dt, velocity[1] * dt);
     }
 
     private void logic(float dt, Viewport worldViewport) {
-        
         float[] playerCenterPosition = new float[] {playerSprite.getX() + playerSprite.getWidth()/2, playerSprite.getY() + playerSprite.getHeight()/2};
-        worldViewport.getCamera().position.lerp(new Vector3(playerCenterPosition[0], playerCenterPosition[1], 0), 0.5f);
+        worldViewport.getCamera().position.lerp(new Vector3(playerCenterPosition[0], playerCenterPosition[1], 0), 0.25f);
         
         this.playerHitBox.colliderPoly.setPosition(playerSprite.getX(), playerSprite.getY());
         this.playerHitBox.colliderPoly.setVertices(new float[]{
@@ -134,18 +148,29 @@ public class Player {
 
     private void checkCollisions() {
         for(Collider collider : Globals.colliders) {
-            if(collider.name.equals("Tier1")) {
-                if(Intersector.overlapConvexPolygons(this.playerHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
-                   System.out.println("Player hit");
-                   Globals.canHitPlayer = false;
-                }
-            } 
+            if(collider.active) {
+                if(collider.name.equals("Tier1")) {
+                    if(Intersector.overlapConvexPolygons(this.playerHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
+                    System.out.println("Player hit");
+                    Globals.canHitPlayer = false;
+                    }
+                } 
+            }
         }
     }
 
     private void render(float dt, float[] worldSize, SpriteBatch spriteBatch) {
         this.playerSprite.setColor(0f, .443f, .663f, 1f);
         this.playerSprite.draw(spriteBatch);
+        for(int i = 0; i < bulletList.size(); i++) {
+            Bullet bullet = this.bulletList.get(i);
+            if(bullet.isDead) {
+                bullet.collider.active = false;
+                this.bulletList.remove(i);
+            } else {
+                this.bulletList.get(i).updateBullet(dt, spriteBatch);
+            }
+        }
     }
 
     public float[] getPlayerPose() {
@@ -155,4 +180,33 @@ public class Player {
     public float[] getPlayerSize() {
         return new float[] {this.playerSprite.getWidth(), this.playerSprite.getHeight()};
     }
+
+    private void spawnBullet(float dt, Viewport wordViewport) {
+        if (this.fireCooldownEndTime < System.currentTimeMillis()) {
+            this.fireCooldownEndTime = System.currentTimeMillis() + this.fireCooldown;
+
+            Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+            mousePos = wordViewport.unproject(mousePos);
+
+            float playerX = playerSprite.getX() + playerSprite.getWidth() / 2f;
+            float playerY = playerSprite.getY() + playerSprite.getHeight() / 2f;
+
+            float dx = mousePos.x - playerX;
+            float dy = mousePos.y - playerY;
+
+            Vector2 direction = new Vector2(dx, dy).nor();
+
+            float[] spawnPosition = new float[] {
+                playerX + direction.x * bulletSpawnOffset,
+                playerY + direction.y * bulletSpawnOffset
+            };
+
+            float[] velocity = new float[] {direction.x, direction.y };
+
+            float angleDeg = MathUtils.atan2(dy, dx) * MathUtils.radiansToDegrees - 90f;
+
+            this.bulletList.add(new Bullet(spawnPosition, velocity, angleDeg));
+        }
+    }
+
 }

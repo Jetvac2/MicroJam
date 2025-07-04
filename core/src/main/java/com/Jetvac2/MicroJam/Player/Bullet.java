@@ -1,0 +1,84 @@
+package com.Jetvac2.MicroJam.Player;
+
+import com.Jetvac2.MicroJam.Util.Collider;
+import com.Jetvac2.MicroJam.Util.Globals;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Polygon;
+
+public class Bullet {
+    // More chronite = less damge longer life
+    private Texture texture;
+    private Sprite sprite;
+    public Collider collider;
+    private float[] velocity;
+    private double startTime;
+    private double maxLifeTime = 1500;
+    private double lifeTime;
+    private float baseDamage = 5f;
+    private float powerMult;
+    public boolean isDead = false;
+    public Bullet(float[] spawnPose, float[] velocity, float angleDeg) {
+        this.texture = new Texture("Sprites/Bullet.png");
+        this.sprite = new Sprite(texture);
+        this.sprite.setSize(.1f, .1f);
+        this.sprite.setPosition(spawnPose[0] - this.sprite.getWidth() / 2f,
+            spawnPose[1] - this.sprite.getHeight() / 2f
+);
+        this.sprite.setOriginCenter();
+        this.sprite.setRotation(angleDeg);
+
+        this.collider = new Collider(new Polygon(new float[] {
+            0f, 0f,
+            this.sprite.getWidth(), 0f,
+            this.sprite.getWidth()/2, this.sprite.getHeight()
+        }), "Bullet");
+        this.collider.colliderPoly.setOrigin(this.sprite.getWidth()/2, this.sprite.getHeight()/2);
+        this.velocity = velocity;
+        this.startTime = System.currentTimeMillis();
+        this.lifeTime = maxLifeTime * Player.numChronite / Player.maxChronite;
+        this.powerMult = (Player.maxChronite / Player.numChronite) * 1.5f;
+        Globals.colliders.add(this.collider);
+    }
+
+    public void updateBullet(float dt, SpriteBatch spriteBatch) {
+        float power = calcPower();
+        this.collider.data = new float[] {power * baseDamage};
+        float[] modVelocity = new float[] {velocity[0] * power, velocity[1] * power};
+        this.sprite.translate(modVelocity[0] * dt, modVelocity[1] * dt);
+
+        this.collider.colliderPoly.setVertices(new float[] {
+            0f, 0f,
+            this.sprite.getWidth(), 0f,
+            this.sprite.getWidth()/2, this.sprite.getHeight()
+        });
+        this.collider.colliderPoly.setPosition(this.sprite.getX(), this.sprite.getY());
+        this.collider.colliderPoly.setRotation(this.sprite.getRotation());
+        
+        sprite.draw(spriteBatch);
+        checkCollisions();
+    }
+
+    private void checkCollisions() {
+        for(Collider collider : Globals.colliders) {
+            if(collider.active) {
+                if(Intersector.overlapConvexPolygons(this.collider.colliderPoly, collider.colliderPoly)) {
+                    if(!collider.name.equals("Player") && !collider.name.equals("Bullet")) {
+                        this.isDead = true;
+                    }
+                }
+            }
+        }
+    }
+
+    private float calcPower() {
+        double timePassed = System.currentTimeMillis() - this.startTime;
+        if(timePassed > lifeTime) {
+            this.isDead = true;
+            return 0;
+        }
+        return (float)(powerMult * (lifeTime / (timePassed + lifeTime)));
+    }
+}
