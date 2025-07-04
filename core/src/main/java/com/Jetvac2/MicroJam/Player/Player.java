@@ -31,7 +31,7 @@ public class Player {
     private float[] velocity = new float[] {0f, 0f};  
     private float acceleration = 5f;                         
     private float deceleration = 20f;
-    private float maxSpeed = 2.5f;
+    private float maxSpeed = 1f;
 
     private boolean setPlayerStartPosition = true;
 
@@ -44,14 +44,14 @@ public class Player {
     private double fireCooldown = 700;
     private double fireCooldownEndTime = -1;
     private float bulletSpawnOffset = 0f;
-    private float bulletCost = 2f;
-    private float chroniteLossPerSecond = 3;
+    private float bulletCost = 1f;
+    private float chroniteLossPerSecond = .5f;
 
     private float[] spriteLayer4BaseSize;
 
     private Sound bulletFireSound;
     private Sound playerHitSound;
-    private float trueMaxSpeed = 4f;
+    private float trueMaxSpeed = 2f;
     private float alpha = 1f;
 
     public Player() {
@@ -92,6 +92,10 @@ public class Player {
             numChronite -= chroniteLossPerSecond * dt;
         } else {
             Globals.gameGoing = false;
+        }
+
+        if(!Globals.gameGoing) {
+            Gdx.graphics.setWindowedMode(20, 20);
         }
         
         input(dt, worldViewport);
@@ -152,7 +156,6 @@ public class Player {
             scaledVec.nor().scl(trueMaxSpeed);
         }
 
-        System.out.println(scaledVec);
         playerSprite.translate(scaledVec.x * dt, scaledVec.y * dt);
 
     }
@@ -210,6 +213,11 @@ public class Player {
                 if(collider.name.contains("Tier")) {
                     if(Intersector.overlapConvexPolygons(this.playerHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
                         Globals.canHitPlayer = false;
+                        if(numChronite - collider.data[0] > 1) {
+                            numChronite -= collider.data[0];
+                        } else {
+                            numChronite = 1;
+                        }
                         this.playerHitSound.play(Globals.soundEffectAudioLevel);
                     }
                 } 

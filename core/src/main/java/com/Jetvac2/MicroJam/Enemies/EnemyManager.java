@@ -10,10 +10,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class EnemyManager {
     private static ArrayList<BaseEnemy> enemyList = new ArrayList<BaseEnemy>();
-    private static double enemySpawnInterval = 750;
-    private static double enemySpawnNext = 0;
-    private static float allowedTier = 1;
+    private static double wavePauseTime = 3000;
+    private static double enemySpawnInterval = 1000;
+    private static double enemySpawnNext = System.currentTimeMillis() + enemySpawnInterval;
     private static int maxEnemyCount = 10;
+    private static int enemiesKilled = 0;
+    private static int waveThreashhold = 4;
+    private static int waveNumber = 1;
 
     public static void updateEnemies(float dt, float[] worldSize, SpriteBatch spriteBatch, float[] playerPosition, float[] playerSize) {
         spawnEnemies(dt, worldSize, playerPosition, playerSize);
@@ -25,6 +28,7 @@ public class EnemyManager {
                 }
                 enemy.enemyHitBox.active = false;
                 enemyList.remove(i);
+                enemiesKilled++;
                 i-=1;
             } else {
                 enemy.updateEnemy(dt, worldSize, spriteBatch, playerPosition, playerSize);
@@ -38,9 +42,12 @@ public class EnemyManager {
             enemyList.remove(0);
         }
 
-        enemySpawnNext = System.currentTimeMillis() + enemySpawnInterval;
-
-        // Divide the circle into sectors
+        if(enemiesKilled >= waveThreashhold-1) {
+            enemySpawnNext = System.currentTimeMillis() +  wavePauseTime;
+            enemiesKilled = 0;
+        } else {
+            enemySpawnNext = System.currentTimeMillis() + enemySpawnInterval;
+        }
         int numSectors = 8;
         int[] sectorCounts = new int[numSectors];
 
@@ -77,7 +84,7 @@ public class EnemyManager {
         float[] spawnPosition = new float[] {spawnX, spawnY};
 
         // Create the enemy
-        int tier = (int)(Math.random() * (int)(allowedTier - 1)) + 1;
+        int tier = MathUtils.random(1, Math.min(waveNumber, 5));
         BaseEnemy enemy;
         switch (tier) {
             case 1:
@@ -90,7 +97,8 @@ public class EnemyManager {
                         new float[] {.25f, .25f},
                         new float[] {.25f, .25f}
                     },
-                    30, 1f, 1.2f, 10f, 3, spawnPosition);
+                    30, 1f, 1.2f, 5f, 3, spawnPosition);
+                    //allowedTier += .25f;
                 break;
             default:
                 enemy = null;
