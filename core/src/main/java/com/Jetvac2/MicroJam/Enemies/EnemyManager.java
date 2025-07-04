@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class EnemyManager {
     private static ArrayList<BaseEnemy> enemyList = new ArrayList<BaseEnemy>();
-    private static double enemySpawnInterval = 1500;
+    private static double enemySpawnInterval = 3000;
     private static double enemySpawnNext = 0;
     private static float allowedTier = 1;
     private static int maxEnemyCount = 20;

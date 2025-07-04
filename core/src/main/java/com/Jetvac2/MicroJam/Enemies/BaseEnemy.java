@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 public class BaseEnemy {
     private Sprite[] enemySprites;
@@ -70,17 +71,34 @@ public class BaseEnemy {
         float dy = playerPose[1] - playerSize[1]/2 - enemyPose[1] + enemySprites[0].getHeight()/2;
 
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
-        float xSpeed = 0f;
-        float ySpeed = 0f;
 
-        if (distance != 0f) {
-            float scale = speed / distance;
+        float separationX = .5f;
+        float separationY = .5f;
+        float separationRadius = .5f; // Adjust based on enemy size
 
-            xSpeed = dx * scale;
-            ySpeed = dy * scale;
+        for (Collider other : Globals.colliders) {
+            if (other == this.enemyHitBox || !other.name.equals(this.enemyHitBox.name)) continue;
+
+            float ox = other.colliderPoly.getX();
+            float oy = other.colliderPoly.getY();
+            float ex = enemyPose[0];
+            float ey = enemyPose[1];
+
+            float distSq = (ox - ex) * (ox - ex) + (oy - ey) * (oy - ey);
+            if (distSq < separationRadius * separationRadius && distSq > 0.0001f) {
+                float dist = (float) Math.sqrt(distSq);
+                float push = (separationRadius - dist) / separationRadius;
+                separationX += (ex - ox) / dist * push;
+                separationY += (ey - oy) / dist * push;
+            }
         }
-        this.enemySprites[0].translate(xSpeed * (Math.max((HP/maxHP * hpSpeedMult), this.minSpeedMult) * dt),
-            ySpeed * (Math.max((HP/maxHP * hpSpeedMult), this.minSpeedMult) * dt));
+
+        float scale = speed / distance;
+        float xSpeed = dx * scale * Math.max((HP / maxHP * hpSpeedMult), this.minSpeedMult)+ separationX;
+        float ySpeed = dy * scale * Math.max((HP / maxHP * hpSpeedMult), this.minSpeedMult) + separationY;
+        Vector2 move = new Vector2(xSpeed, ySpeed).nor().scl(speed);
+        enemySprites[0].translate(move.x * dt, move.y * dt);
+
         float targetRotation = (float)Math.toDegrees(MathUtils.atan2(dy, dx)) - 90;
         float lerpFactor = lerpConstant * dt;
         float lerpedAngle = MathUtils.lerpAngleDeg(enemySprites[0].getRotation(), targetRotation, lerpFactor);
