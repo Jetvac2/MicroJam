@@ -1,6 +1,7 @@
 package com.Jetvac2.MicroJam;
 
 import com.Jetvac2.MicroJam.Enemies.BaseEnemy;
+import com.Jetvac2.MicroJam.Enemies.EnemyManager;
 import com.Jetvac2.MicroJam.Player.Player;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -24,7 +25,6 @@ public class Main implements ApplicationListener {
     private SpriteBatch enemyBatch;
     private Player player;
     private FitViewport worldViewport;
-    private BaseEnemy enemy;
 
     @Override
     public void create() {
@@ -33,7 +33,6 @@ public class Main implements ApplicationListener {
         this.playerBatch = new SpriteBatch();
         this.enemyBatch = new SpriteBatch();
         this.player = new Player();
-        this.enemy = new BaseEnemy("Tier1", "Sprites/Enemies/Tier1EnemyTex.png", 20, 2f, 1.2f, 3f, new float[] {1f, 1.8f});
     }
 
     @Override
@@ -66,12 +65,11 @@ public class Main implements ApplicationListener {
 
         this.enemyBatch.setProjectionMatrix(this.worldViewport.getCamera().view);
         this.enemyBatch.begin();
-        this.enemy.updateEnemy(dt, worldSize, enemyBatch, playerPose);
+        EnemyManager.updateEnemies(dt, worldSize, enemyBatch, playerPose, playerSize);
         this.enemyBatch.end();
 
         backgroundRenderer.begin(ShapeType.Line);
         backgroundRenderer.setColor(dt, 1, dt, dt);
-        backgroundRenderer.polygon(this.enemy.enemyHitBox.colliderPoly.getTransformedVertices());
         backgroundRenderer.polygon(this.player.playerHitBox.colliderPoly.getTransformedVertices());
         backgroundRenderer.end();
     }

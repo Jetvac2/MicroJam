@@ -20,15 +20,15 @@ public class BaseEnemy {
     public Collider enemyHitBox;
     private boolean setStartPosition = true;
     private float lerpConstant = 5f;
-    private float HP;
+    public float HP;
     private float maxHP;
     private float speed;
     private float hpSpeedMult;
-    private float droppedChronite;
+    public float droppedChronite;
     private float[] spawnPosition;
 
     // TODO: Add argumetns for partical effects for taking damage and for dieing. 
-    public BaseEnemy(String enemyType, String textureFile, float HP, float speed, float hpSpeedMult ,float droppedChronite, float[] spawnPosition) {
+    public BaseEnemy(String enemyType, String textureFile, float HP, float speed, float hpSpeedMult, float chroniteDamage, float droppedChronite, float[] spawnPosition) {
         this.enemyTex = new Texture(textureFile);
         this.enemySprite = new Sprite(this.enemyTex);
         this.enemySprite.setSize(.25f, .25f);
@@ -37,6 +37,7 @@ public class BaseEnemy {
             this.enemySprite.getWidth(), 0f,
             enemySprite.getWidth()/2, enemySprite.getHeight()
         }), enemyType);
+        this.enemyHitBox.data = new float[] {chroniteDamage};
         this.enemySprite.setOriginCenter();
         enemyHitBox.colliderPoly.setOrigin(enemySprite.getWidth() / 2f, enemySprite.getHeight() / 2f);
         this.HP = HP;
@@ -49,21 +50,21 @@ public class BaseEnemy {
         Globals.colliders.add(this.enemyHitBox);
     }
 
-    public void updateEnemy(float dt, float[] worldSize, SpriteBatch spriteBatch, float[] playerPose) {
+    public void updateEnemy(float dt, float[] worldSize, SpriteBatch spriteBatch, float[] playerPose, float[] playerSize) {
         if(setStartPosition) {
             this.enemySprite.setPosition(spawnPosition[0] + this.enemySprite.getWidth(),
             spawnPosition[1] + this.enemySprite.getHeight());
             setStartPosition = false;
         }
-        logic(dt,  playerPose);
+        logic(dt,  playerPose, playerSize);
         render(dt, worldSize, spriteBatch);
     }
 
-    private void logic(float dt, float[] playerPose) {
+    private void logic(float dt, float[] playerPose, float[] playerSize) {
         float[] enemyPose = getEnemyPose();
 
-        float dx = playerPose[0] - enemyPose[0];
-        float dy = playerPose[1] - enemyPose[1];
+        float dx = playerPose[0] - playerSize[0]/2 - enemyPose[0] + enemySprite.getWidth()/2;
+        float dy = playerPose[1] - playerSize[1]/2 - enemyPose[1] + enemySprite.getHeight()/2;
 
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
         float xSpeed = 0f;

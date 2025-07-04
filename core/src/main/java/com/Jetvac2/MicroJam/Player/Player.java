@@ -31,16 +31,18 @@ public class Player {
 
     private boolean setPlayerStartPosition = true;
 
-    public static float maxChronite = 20;
-    public static float numChronite = 20;
+    public static float maxChronite = 21;
+    public static float numChronite = 21;
 
     private double IFrameTime = 250;
     private double IFrameEndTime = -1;
 
     private double fireCooldown = 700;
     private double fireCooldownEndTime = -1;
-    private float bulletVelocityMag = 2f;
     private float bulletSpawnOffset = 0f;
+    private float bulletCost = 2f;
+    private float chroniteLossPerSecond = 3;
+
 
     public Player() {
         this.playerTex = new Texture("Sprites/PlayerTex.png");
@@ -60,6 +62,14 @@ public class Player {
             this.playerSprite.setPosition(worldSize[0]/2, worldSize[1]/2);
             this.setPlayerStartPosition = false;
         }
+        if(numChronite - chroniteLossPerSecond * dt > 1) {
+            numChronite -= chroniteLossPerSecond * dt;
+        } else {
+            numChronite = 20;
+            Globals.gameGoing = false;
+        }
+        
+        System.out.println(numChronite);
         input(dt, worldViewport);
         logic(dt, worldViewport);
         render(dt, worldSize, spriteBatch);
@@ -113,7 +123,7 @@ public class Player {
         // Basic Ranged Attack
 
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT) ||
-            Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+            Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.R)) {
             spawnBullet(dt, worldViewport);
         }
 
@@ -184,7 +194,12 @@ public class Player {
     private void spawnBullet(float dt, Viewport wordViewport) {
         if (this.fireCooldownEndTime < System.currentTimeMillis()) {
             this.fireCooldownEndTime = System.currentTimeMillis() + this.fireCooldown;
-
+            if(numChronite - bulletCost>= 1) {
+                numChronite -= - bulletCost;
+            } else {
+                numChronite = 20;
+                Globals.gameGoing = false;
+            }
             Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             mousePos = wordViewport.unproject(mousePos);
 
