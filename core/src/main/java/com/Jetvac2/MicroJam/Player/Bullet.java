@@ -2,6 +2,8 @@ package com.Jetvac2.MicroJam.Player;
 
 import com.Jetvac2.MicroJam.Util.Collider;
 import com.Jetvac2.MicroJam.Util.Globals;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -20,6 +22,7 @@ public class Bullet {
     private float baseDamage = 5f;
     private float powerMult;
     public boolean isDead = false;
+    private Sound explodingSoundEffect;
     public Bullet(float[] spawnPose, float[] velocity, float angleDeg) {
         this.texture = new Texture("Sprites/Bullet.png");
         this.sprite = new Sprite(texture);
@@ -40,6 +43,7 @@ public class Bullet {
         this.startTime = System.currentTimeMillis();
         this.lifeTime = maxLifeTime * Player.numChronite / Player.maxChronite;
         this.powerMult = (Player.maxChronite / Player.numChronite) * 1.5f;
+        this.explodingSoundEffect = Gdx.audio.newSound(Gdx.files.local("SoundEffects/bulletExplodingSoundEffect.wav"));
         Globals.colliders.add(this.collider);
     }
 
@@ -67,6 +71,7 @@ public class Bullet {
                 if(Intersector.overlapConvexPolygons(this.collider.colliderPoly, collider.colliderPoly)) {
                     if(!collider.name.equals("Player") && !collider.name.equals("Bullet")) {
                         this.isDead = true;
+                        this.explodingSoundEffect.play(Globals.soundEffectAudioLevel);
                     }
                 }
             }

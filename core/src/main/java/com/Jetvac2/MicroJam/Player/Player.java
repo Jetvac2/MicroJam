@@ -6,6 +6,7 @@ import com.Jetvac2.MicroJam.Util.Collider;
 import com.Jetvac2.MicroJam.Util.Globals;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -49,6 +50,7 @@ public class Player {
 
     private float[] spriteLayer4BaseSize;
 
+    private Sound bulletFireSound;
 
     public Player() {
         this.playerSprite = new Sprite(new Texture("Sprites/Player/PlayerTexBase.png"));
@@ -70,6 +72,8 @@ public class Player {
             0f, this.playerSprite.getHeight()
         }), "Player");
         Globals.colliders.add(this.playerHitBox);
+
+        this.bulletFireSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/bulletFire.wav"));
     }
 
     public void updatePlayer(float dt, Viewport worldViewport, float[] worldSize, SpriteBatch spriteBatch) {
@@ -230,12 +234,13 @@ public class Player {
 
     private void spawnBullet(float dt, Viewport wordViewport) {
         if (this.fireCooldownEndTime < System.currentTimeMillis()) {
+            this.bulletFireSound.play(Globals.musicAudioLevel);
             this.fireCooldownEndTime = System.currentTimeMillis() + this.fireCooldown;
             if(numChronite - bulletCost>= 1) {
                 numChronite -= bulletCost;
             } else {
                 Globals.gameGoing = false;
-            }
+            } 
             Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             mousePos = wordViewport.unproject(mousePos);
 
