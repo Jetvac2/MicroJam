@@ -13,6 +13,7 @@ public class ChroniteManager {
     private static float[] spawnPoint;
     private static int spawnPerFrame = 1;
     private static float maxChroniteAge = 3f;
+    private static int maxChroniteNum = 40;
     public static void spawnChronite(int number, float[] spawnOrgin) {
         int numberMod = ((int)(Math.random() * 4f)) - 2;
         toSpawn += number;
@@ -23,6 +24,9 @@ public class ChroniteManager {
         for(int i = 0; i < Math.min(spawnPerFrame, toSpawn); i++) {
             toSpawn--;
             chroniteList.add(new Chronite(spawnPoint));
+            if(chroniteList.size() >= maxChroniteNum) {
+                chroniteList.remove(i);
+            }
         }
 
         for(int i = 0; i < chroniteList.size(); i++) {

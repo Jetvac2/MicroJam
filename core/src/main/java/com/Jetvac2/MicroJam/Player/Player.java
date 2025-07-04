@@ -54,9 +54,13 @@ public class Player {
 
     public Player() {
         this.playerSprite = new Sprite(new Texture("Sprites/Player/PlayerTexBase.png"));
+        this.playerSprite.getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         this.spriteLayer2 = new Sprite(new Texture("Sprites/Player/PlayerTex2.png"));
+        this.spriteLayer2.getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         this.spriteLayer3 = new Sprite(new Texture("Sprites/Player/PlayerTex3.png"));
+        this.spriteLayer3.getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         this.spriteLayer4 = new Sprite(new Texture("Sprites/Player/PlayerTex4.png"));
+        this.spriteLayer4.getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         this.playerSprite.setSize(.25f, .25f);
         this.spriteLayer2.setSize(.25f, .25f);
         this.spriteLayer3.setSize(.23f, .23f);
@@ -90,7 +94,7 @@ public class Player {
         
         input(dt, worldViewport);
         logic(dt, worldViewport);
-        render(dt, worldSize, spriteBatch);
+        render(dt, worldSize, spriteBatch, worldViewport);
     }
 
     private void input(float dt, Viewport worldViewport) {
@@ -143,9 +147,12 @@ public class Player {
         if (movementDir.len2() > 0.0001f) {
             movementDir.nor(); // normalize only if moving
         }
-
-
-        playerSprite.translate(velocity[0] * dt, velocity[1] * dt);
+        float pixelsPerUnit = Gdx.graphics.getWidth() / worldViewport.getWorldWidth();
+        float newX = velocity[0] * dt + this.playerSprite.getX();
+        float newY = velocity[1] * dt + this.playerSprite.getY();
+        newX = Math.round(newX * pixelsPerUnit) / pixelsPerUnit;
+        newY = Math.round(newY * pixelsPerUnit) / pixelsPerUnit;
+        playerSprite.setPosition(newX, newY);
     }
 
     private void logic(float dt, Viewport worldViewport) {
@@ -155,8 +162,10 @@ public class Player {
         // Get current movement direction
         Vector2 movementDir = new Vector2(velocity[0], velocity[1]);
         Vector2 offset = new Vector2(movementDir).nor().scl((float)-Math.max(Math.sqrt((double)movementDir.len2()/5f), .1)).scl(.05f);
-    
+        float pixelsPerUnit = Gdx.graphics.getWidth() / worldViewport.getWorldWidth();
         Vector3 cameraTarget = new Vector3(playerX + offset.x, playerY + offset.y, 0);
+        cameraTarget.x = Math.round(cameraTarget.x * pixelsPerUnit)/ pixelsPerUnit;
+        cameraTarget.y = Math.round(cameraTarget.y * pixelsPerUnit)/ pixelsPerUnit;
         worldViewport.getCamera().position.set(cameraTarget);
         worldViewport.getCamera().update();
         
@@ -197,7 +206,7 @@ public class Player {
         }
     }
 
-    private void render(float dt, float[] worldSize, SpriteBatch spriteBatch) {
+    private void render(float dt, float[] worldSize, SpriteBatch spriteBatch, Viewport worldViewport) {
         float chroniteRatioSmall = (numChronite / maxChronite);
         float chroniteRatioLarge = (maxChronite / numChronite);
         this.spriteLayer2.rotate(90 * chroniteRatioSmall * dt);
@@ -207,7 +216,9 @@ public class Player {
         this.spriteLayer2.setColor(.2f * chroniteRatioLarge - .2f, .5f * chroniteRatioSmall + .3f, .6f * chroniteRatioSmall + .4f , 1f);
         this.spriteLayer3.setColor(.2f * chroniteRatioLarge - .1f, .6f * chroniteRatioSmall + .4f, .6f * chroniteRatioSmall + .4f , 1f);
         this.spriteLayer4.setColor(1, 1, 1, 1f * chroniteRatioSmall + .25f);
-
+        
+        spriteBatch.setProjectionMatrix(worldViewport.getCamera().view);
+        spriteBatch.begin();
         this.playerSprite.draw(spriteBatch);
         this.spriteLayer2.draw(spriteBatch);
         this.spriteLayer3.draw(spriteBatch);
@@ -222,6 +233,8 @@ public class Player {
                 this.bulletList.get(i).updateBullet(dt, spriteBatch);
             }
         }
+        spriteBatch.end();
+        
     }
 
     public float[] getPlayerPose() {

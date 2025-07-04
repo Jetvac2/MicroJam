@@ -31,15 +31,19 @@ public class Main implements ApplicationListener {
     private FitViewport worldViewport;
 
     private ParticleEffect backgroundSpice;
+    private SpriteBatch backgroundSpiceBatch;
     private int backgroundSpiceLength = 5;
 
     @Override
     public void create() {
+        Gdx.graphics.setVSync(true);
+        Gdx.graphics.setForegroundFPS(30);
         this.worldViewport = new FitViewport(2f, 2f, new OrthographicCamera());
         this.backgroundRenderer = new ShapeRenderer();
         this.playerBatch = new SpriteBatch();
         this.enemyBatch = new SpriteBatch();
         this.player = new Player();
+        this.backgroundSpiceBatch = new SpriteBatch();
 
         this.backgroundSpice = new ParticleEffect();
         this.backgroundSpice.loadEmitters(Gdx.files.internal("ParticalEffect/BackgroundSpice.p"));
@@ -100,14 +104,14 @@ public class Main implements ApplicationListener {
         this.backgroundRenderer.rect(playerPose[0] - worldSize[0]/2 + playerSize[0]/2 , playerPose[1] - worldSize[1]/2 + playerSize[1]/2, worldSize[0], worldSize[1]);
         this.backgroundRenderer.end();
 
+        this.backgroundSpiceBatch.setProjectionMatrix(this.worldViewport.getCamera().view);
+        this.backgroundSpiceBatch.begin();
+        this.backgroundSpice.draw(this.backgroundSpiceBatch);
+        ChroniteManager.updateChronite(dt, this.backgroundSpiceBatch);
+        this.backgroundSpiceBatch.end();
         // Render Player
-        this.playerBatch.setProjectionMatrix(this.worldViewport.getCamera().view);
-        this.playerBatch.begin();
-        this.backgroundSpice.draw(this.playerBatch);
-        ChroniteManager.updateChronite(dt, playerBatch);
         this.player.updatePlayer(dt, worldViewport, worldSize,
             this.playerBatch);
-        this.playerBatch.end();
 
         this.enemyBatch.setProjectionMatrix(this.worldViewport.getCamera().view);
         this.enemyBatch.begin();

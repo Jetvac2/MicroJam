@@ -12,6 +12,7 @@ public class EnemyManager {
     private static double enemySpawnInterval = 1500;
     private static double enemySpawnNext = 0;
     private static float allowedTier = 1;
+    private static int maxEnemyCount = 20;
 
     public static void updateEnemies(float dt, float[] worldSize, SpriteBatch spriteBatch, float[] playerPosition, float[] playerSize) {
         spawnEnemies(dt, worldSize, playerPosition, playerSize);
@@ -30,6 +31,9 @@ public class EnemyManager {
 
     private static void spawnEnemies(float dt, float[] worldSize, float[] playerPosition, float[] playerSize) {
         if(System.currentTimeMillis() > enemySpawnNext) {
+            if(enemyList.size() >= maxEnemyCount) {
+                enemyList.remove(0);
+            }
             enemySpawnNext = System.currentTimeMillis() + enemySpawnInterval;
             float spawnDistence = (worldSize[0] + worldSize[1]) / 2;
             float spawnAngle = (int)(Math.random() * 361);
