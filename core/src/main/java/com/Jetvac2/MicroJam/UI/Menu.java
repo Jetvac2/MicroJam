@@ -160,7 +160,7 @@ public class Menu {
         }
 
         this.worldSize = new Vector2(stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
-        this.title.setPosition(worldSize.x/2 - worldSize.x/2.5f, worldSize.y - worldSize.y/15);
+        this.title.setPosition(worldSize.x/2 - worldSize.x/2.95f, worldSize.y - worldSize.y/15);
         this.title.setSize(.15f, .15f);
         this.lore.setPosition(0, 0);
         this.lore.setSize(worldSize.x/3.75f , worldSize.y - worldSize.y/12);
