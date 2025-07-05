@@ -64,6 +64,7 @@ public class Player {
     private float alpha = 1f;
 
     private Sound timeFreezeEffect;
+    private Sound playerDeath;
 
     public Player() {
         this.playerSprite = new Sprite(new Texture("Sprites/Player/PlayerTexBase.png"));
@@ -92,6 +93,7 @@ public class Player {
 
         this.bulletFireSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/bulletFire.wav"));
         this.timeFreezeEffect = Gdx.audio.newSound(Gdx.files.internal("Music/TimeFreezeEffect.mp3"));
+        this.playerDeath = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/PlayerDeathSound.wav"));
     }
 
     public void updatePlayer(float dt, Viewport worldViewport, float[] worldSize, SpriteBatch spriteBatch) {
@@ -106,6 +108,8 @@ public class Player {
                 Globals.gameGoing = false;
                 Globals.scores.add(Globals.score);
                 Globals.score = 0;
+                this.timeFreezeEffect.stop();
+                this.playerDeath.play(Globals.soundEffectAudioLevel);
             }
 
             if(setPlayerStartPosition) {
