@@ -1,0 +1,94 @@
+{
+com.badlogic.gdx.graphics.Color: {
+	ButtonText: {
+		r: 1
+		g: 0
+		b: 0.33333334
+		a: 1
+	}
+	RGBA_255_255_255_255: {
+		r: 1
+		g: 1
+		b: 1
+		a: 1
+	}
+	TextColor: {
+		r: 0.73333335
+		g: 0
+		b: 1
+		a: 1
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
+	Button: {
+		name: ButtonBase
+		color: {
+			r: 0
+			g: 0.44313726
+			b: 0.6627451
+			a: 1
+		}
+	}
+	ButtonOver: {
+		name: ButtonBase
+		color: {
+			r: 0.07058824
+			g: 0.5764706
+			b: 0.6627451
+			a: 1
+		}
+	}
+	ButtonDown: {
+		name: ButtonBase
+		color: {
+			r: 0.05882353
+			g: 0.5058824
+			b: 0.6666667
+			a: 1
+		}
+	}
+	Background: {
+		name: white-pixel
+		color: RGBA_255_255_255_255
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
+	default: {
+		font: LabalFont
+		fontColor: TextColor
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
+	default-horizontal: {
+		knobOver: KnobOver
+		knobDown: KnobDown
+		background: Background
+		knob: KnobBase
+		knobBefore: SliderActive
+		knobAfter: SliderBase
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
+	default: {
+		font: ButtonFont
+		fontColor: ButtonText
+		downFontColor: ButtonText
+		overFontColor: ButtonText
+		focusedFontColor: ButtonText
+		disabledFontColor: ButtonText
+		checkedFontColor: ButtonText
+		checkedDownFontColor: ButtonText
+		checkedOverFontColor: ButtonText
+		checkedFocusedFontColor: ButtonText
+		up: Button
+		down: ButtonDown
+		over: ButtonOver
+		pressedOffsetY: -5
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
+	default: {
+		label: default
+	}
+}
+}

@@ -21,6 +21,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class Player {
+    private boolean inStartState = true;
+
     private Sprite playerSprite;
     private Sprite spriteLayer2;
     private Sprite spriteLayer3;
@@ -97,25 +99,31 @@ public class Player {
             this.bulletFireSound.play(0f);
             Globals.bulletFireEffectPrepped = true;
         }
-        if(setPlayerStartPosition) {
-            this.playerSprite.setPosition(worldSize[0]/2, worldSize[1]/2);
-            this.setPlayerStartPosition = false;
-        }
-        if(numChronite - chroniteLossPerSecond * dt > 1) {
-            if(!Globals.freezeTime) {
-                numChronite -= chroniteLossPerSecond * dt;
+        if(Globals.gameGoing) {
+            this.inStartState = false;
+            Globals.score += Globals.scoreAddPerSecond * dt;
+            if(numChronite <= 1) {
+                Globals.gameGoing = false;
+                Globals.scores.add(Globals.score);
+                Globals.score = 0;
             }
-        } else {
-            Globals.gameGoing = false;
-        }
 
-        if(!Globals.gameGoing) {
-            //Gdx.graphics.setWindowedMode(20, 20);
+            if(setPlayerStartPosition) {
+                this.playerSprite.setPosition(worldSize[0]/2, worldSize[1]/2);
+                this.setPlayerStartPosition = false;
+            }
+            if(numChronite - chroniteLossPerSecond * dt > 1) {
+                if(!Globals.freezeTime) {
+                    numChronite -= chroniteLossPerSecond * dt;
+                }
+            } 
+            
+            input(dt, worldViewport);
+            logic(dt, worldViewport);
+            render(dt, worldSize, spriteBatch, worldViewport);
+        } else if(!this.inStartState) {
+            reset();
         }
-        
-        input(dt, worldViewport);
-        logic(dt, worldViewport);
-        render(dt, worldSize, spriteBatch, worldViewport);
     }
 
     private void input(float dt, Viewport worldViewport) {
@@ -308,8 +316,6 @@ public class Player {
                 if(!Globals.freezeTime) {
                     numChronite -= bulletCost;
                 }
-            } else {
-                Globals.gameGoing = false;
             } 
             Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             mousePos = wordViewport.unproject(mousePos);
@@ -335,4 +341,29 @@ public class Player {
         }
     }
 
+    private void reset() {
+        this.setPlayerStartPosition = true;
+        maxChronite = 21f;
+        numChronite = maxChronite;
+        
+        for(int i = 0; i < bulletList.size(); i++) {
+            bulletList.get(i).collider.active = false;
+            bulletList.remove(i);
+            i--;
+        }
+
+        velocity = new float[] {0f, 0f};  
+        IFrameEndTime = -1;
+        fireCooldownEndTime = -1;
+        freezeTimeCooldownEndTime = -1;
+        freezeTimeEndTime = -1;
+        isFreezeTimeCooldownActive = false;
+        alpha = 1f;
+
+        this.bulletFireSound.stop();
+        this.timeFreezeEffect.stop();
+        
+        Globals.canHitPlayer = true;
+        Globals.freezeTime = false;
+    }
 }

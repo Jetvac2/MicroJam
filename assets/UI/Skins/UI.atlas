@@ -1,0 +1,55 @@
+
+UI.png
+size: 2048, 2048
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+white-pixel
+  rotate: false
+  xy: 1853, 1977
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+ButtonBase
+  rotate: false
+  xy: 1, 1395
+  size: 1850, 583
+  orig: 1850, 583
+  offset: 0, 0
+  index: -1
+KnobBase
+  rotate: false
+  xy: 508, 508
+  size: 505, 505
+  orig: 505, 505
+  offset: 0, 0
+  index: -1
+KnobDown
+  rotate: false
+  xy: 1, 508
+  size: 505, 505
+  orig: 505, 505
+  offset: 0, 0
+  index: -1
+KnobOver
+  rotate: false
+  xy: 1, 1
+  size: 505, 505
+  orig: 505, 505
+  offset: 0, 0
+  index: -1
+SliderActive
+  rotate: false
+  xy: 1, 1015
+  size: 1850, 188
+  orig: 1850, 188
+  offset: 0, 0
+  index: -1
+SliderBase
+  rotate: false
+  xy: 1, 1205
+  size: 1850, 188
+  orig: 1850, 188
+  offset: 0, 0
+  index: -1

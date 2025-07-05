@@ -25,6 +25,7 @@ public class Chronite {
     private float degreesPerSecond = (int)(Math.random() * 360) - 180;
     public float age;
     private Sound chronitePickUpSoundEffect;
+
     public Chronite(float[] spawnOrgin) {
         this.tex = new Texture("Sprites/ChroniteShard.png");
         this.sprite = new Sprite(tex);
@@ -82,6 +83,7 @@ public class Chronite {
                         collected = true;
                         Player.numChronite = Math.min(Player.maxChronite, Player.numChronite+2);
                         this.chronitePickUpSoundEffect.play(Globals.soundEffectAudioLevel);
+                        Globals.score += Globals.chroniteScoreAdd;
                     }
                 } 
             }

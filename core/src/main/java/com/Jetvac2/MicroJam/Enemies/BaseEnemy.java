@@ -35,7 +35,7 @@ public class BaseEnemy {
     
 
     // TODO: Add argumetns for partical effects for taking damage and for dieing. 
-    public BaseEnemy(String enemyType, String[] textureFiles, float[][] scale, float HP, float speed, float hpSpeedMult, float chroniteDamage, int droppedChronite, float[] spawnPosition) {
+    public BaseEnemy(String enemyType, String[] textureFiles, float[][] scale, float HP, float speed, float hpSpeedMult, float chroniteDamage, int droppedChronite, float[] spawnPosition, float score) {
         this.enemySprites = new Sprite[textureFiles.length];
         for(int i = 0; i < enemySprites.length; i++) {
             this.enemySprites[i] = new Sprite(new Texture(textureFiles[i]));
@@ -48,7 +48,7 @@ public class BaseEnemy {
             this.enemySprites[0].getWidth(), 0f,
             enemySprites[0].getWidth()/2, enemySprites[0].getHeight()
         }), enemyType);
-        this.enemyHitBox.data = new float[] {chroniteDamage};
+        this.enemyHitBox.data = new float[] {chroniteDamage, score};
         enemyHitBox.colliderPoly.setOrigin(enemySprites[0].getWidth() / 2f, enemySprites[0].getHeight() / 2f);
         this.HP = HP;
         this.maxHP = HP;
