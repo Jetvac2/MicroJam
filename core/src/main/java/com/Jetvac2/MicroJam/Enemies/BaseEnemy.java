@@ -2,8 +2,11 @@ package com.Jetvac2.MicroJam.Enemies;
 
 import java.util.ArrayList;
 
+import com.Jetvac2.MicroJam.Player.Player;
 import com.Jetvac2.MicroJam.Util.Collider;
 import com.Jetvac2.MicroJam.Util.Globals;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -28,6 +31,8 @@ public class BaseEnemy {
     private float[] spawnPosition;
     private float minSpeedMult = .5f;
     public boolean dirty = false;
+    private Sound playerHitSound;
+    
 
     // TODO: Add argumetns for partical effects for taking damage and for dieing. 
     public BaseEnemy(String enemyType, String[] textureFiles, float[][] scale, float HP, float speed, float hpSpeedMult, float chroniteDamage, int droppedChronite, float[] spawnPosition) {
@@ -51,7 +56,7 @@ public class BaseEnemy {
         this.droppedChronite = droppedChronite;
         this.spawnPosition = spawnPosition;
         this.hpSpeedMult = hpSpeedMult;
-        
+        this.playerHitSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/PlayerHit.wav"));
         Globals.colliders.add(this.enemyHitBox);
     }
 
@@ -124,8 +129,15 @@ public class BaseEnemy {
         for(Collider collider : Globals.colliders) {
             if(collider.active) {
                 if(collider.name.equals("Player")) {
-                    if(Intersector.overlapConvexPolygons(this.enemyHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer){
+                    if(Intersector.overlapConvexPolygons(this.enemyHitBox.colliderPoly, collider.colliderPoly) && Globals.canHitPlayer) {
                         this.dirty = true;
+                        Globals.canHitPlayer = false;
+                        if(Player.numChronite - this.enemyHitBox.data[0] > 1) {
+                            Player.numChronite -= this.enemyHitBox.data[0];
+                        } else {
+                            Player.numChronite = 1;
+                        } 
+                        this.playerHitSound.play(Globals.soundEffectAudioLevel);
                     }
                 } else if(collider.name.equals("Bullet")) {
                     if(Intersector.overlapConvexPolygons(this.enemyHitBox.colliderPoly, collider.colliderPoly)){
