@@ -1,27 +1,21 @@
 package com.Jetvac2.MicroJam;
 
-import com.Jetvac2.MicroJam.Enemies.BaseEnemy;
 import com.Jetvac2.MicroJam.Enemies.EnemyManager;
-import com.Jetvac2.MicroJam.Player.Chronite;
 import com.Jetvac2.MicroJam.Player.ChroniteManager;
 import com.Jetvac2.MicroJam.Player.Player;
+import com.Jetvac2.MicroJam.Util.Globals;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class Main implements ApplicationListener {
     private ShapeRenderer backgroundRenderer;
@@ -33,6 +27,7 @@ public class Main implements ApplicationListener {
     private ParticleEffect backgroundSpice;
     private SpriteBatch backgroundSpiceBatch;
     private int backgroundSpiceLength = 5;
+    ;
 
     @Override
     public void create() {
@@ -51,7 +46,10 @@ public class Main implements ApplicationListener {
         this.backgroundSpice.setDuration(backgroundSpiceLength);
         this.backgroundSpice.scaleEffect(.1f);
         this.backgroundSpice.start();
-        
+        Globals.gamePlayTrack = Gdx.audio.newMusic(Gdx.files.local("Music/GamePlayTrack.wav"));
+        Globals.gamePlayTrack.setLooping(true);
+        Globals.gamePlayTrack.play();
+    
     }
 
     @Override
@@ -117,10 +115,7 @@ public class Main implements ApplicationListener {
         EnemyManager.updateEnemies(dt, worldSize, enemyBatch, playerPose, playerSize);
         this.enemyBatch.end();
 
-        backgroundRenderer.begin(ShapeType.Line);
-        backgroundRenderer.setColor(dt, 1, dt, dt);
-        backgroundRenderer.polygon(this.player.playerHitBox.colliderPoly.getTransformedVertices());
-        backgroundRenderer.end();
+      
     }
 
     @Override

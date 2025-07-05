@@ -31,7 +31,7 @@ public class Player {
     private float[] velocity = new float[] {0f, 0f};  
     private float acceleration = 5f;                         
     private float deceleration = 20f;
-    private float maxSpeed = 1f;
+    private float maxSpeed = 1.5f;
 
     private boolean setPlayerStartPosition = true;
 
@@ -41,17 +41,27 @@ public class Player {
     private double IFrameTime = 670;
     private double IFrameEndTime = -1;
 
-    private double fireCooldown = 700;
+    private double fireCooldown = 500;
     private double fireCooldownEndTime = -1;
     private float bulletSpawnOffset = 0f;
-    private float bulletCost = 1.5f;
-    private float chroniteLossPerSecond = .75f;
-
+    private float bulletCost = 1.25f;
+    private float chroniteLossPerSecond = .6f;
     private float[] spriteLayer4BaseSize;
 
+
+    private float freezeTimeTrigger = 2f;
+    private double freezeTimeCooldownTime = 15000;
+    private double freezeTimeCooldownEndTime = -1;
+    private double freezeTimeMaxTime = 7500;
+    private double freezeTimeEndTime = -1;
+    private boolean isFreezeTimeCooldownActive = false;
+    private float minChroniteToFreezeTime = 14.6f;
+
     private Sound bulletFireSound;
-    private float trueMaxSpeed = 2f;
+    private float trueMaxSpeed = 2.5f;
     private float alpha = 1f;
+
+    private Sound timeFreezeEffect;
 
     public Player() {
         this.playerSprite = new Sprite(new Texture("Sprites/Player/PlayerTexBase.png"));
@@ -79,6 +89,7 @@ public class Player {
         Globals.colliders.add(this.playerHitBox);
 
         this.bulletFireSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/bulletFire.wav"));
+        this.timeFreezeEffect = Gdx.audio.newSound(Gdx.files.internal("Music/TimeFreezeEffect.wav"));
     }
 
     public void updatePlayer(float dt, Viewport worldViewport, float[] worldSize, SpriteBatch spriteBatch) {
@@ -87,13 +98,15 @@ public class Player {
             this.setPlayerStartPosition = false;
         }
         if(numChronite - chroniteLossPerSecond * dt > 1) {
-            numChronite -= chroniteLossPerSecond * dt;
+            if(!Globals.freezeTime) {
+                numChronite -= chroniteLossPerSecond * dt;
+            }
         } else {
             Globals.gameGoing = false;
         }
 
         if(!Globals.gameGoing) {
-            //Gdx.graphics.setWindowedMode(20, 20);
+            Gdx.graphics.setWindowedMode(20, 20);
         }
         
         input(dt, worldViewport);
@@ -186,6 +199,7 @@ public class Player {
             0f, this.playerSprite.getHeight()
         });
 
+     
         if(!Globals.canHitPlayer) {
             if(this.IFrameEndTime == -1) {
                 this.IFrameEndTime = System.currentTimeMillis() + this.IFrameTime;
@@ -201,6 +215,25 @@ public class Player {
             }
     
         }
+        if(this.freezeTimeCooldownEndTime < System.currentTimeMillis()) {
+            if(numChronite <= this.freezeTimeTrigger && this.freezeTimeEndTime == -1 && maxChronite >= this.minChroniteToFreezeTime) {
+                Globals.freezeTime = true;
+                this.freezeTimeEndTime = System.currentTimeMillis() + this.freezeTimeMaxTime;
+                maxChronite /= 1.2f;
+                this.timeFreezeEffect.play(Globals.musicAudioLevel);
+                Globals.gamePlayTrack.pause();
+            } 
+            this.isFreezeTimeCooldownActive = false;
+        } 
+        if(System.currentTimeMillis() > this.freezeTimeEndTime && Globals.freezeTime) {
+                Globals.freezeTime = false;
+                this.freezeTimeEndTime = -1;
+                this.freezeTimeCooldownEndTime = System.currentTimeMillis() + freezeTimeCooldownTime;
+                Globals.gamePlayTrack.play();
+                this.timeFreezeEffect.stop();
+                this.isFreezeTimeCooldownActive = true;
+            }
+        
 
         //checkCollisions();
     }
@@ -218,8 +251,17 @@ public class Player {
     private void render(float dt, float[] worldSize, SpriteBatch spriteBatch, Viewport worldViewport) {
         float chroniteRatioSmall = (numChronite / maxChronite);
         float chroniteRatioLarge = (maxChronite / numChronite);
-        this.spriteLayer2.rotate(90 * chroniteRatioSmall * dt);
-        this.spriteLayer3.rotate(-120 * chroniteRatioSmall * dt );
+
+        if(!(Globals.freezeTime || this.isFreezeTimeCooldownActive)) {
+            float ratio = (maxChronite) / minChroniteToFreezeTime;
+            if(ratio < 1) {
+                ratio = 0;
+            }
+            this.spriteLayer2.rotate(90 * ratio * dt);
+            this.spriteLayer3.rotate(-120 * ratio  * dt);
+        }
+        
+
         this.spriteLayer4.setSize(this.spriteLayer4BaseSize[0] * (numChronite / maxChronite), this.spriteLayer4BaseSize[1] * (numChronite / maxChronite));
         this.playerSprite.setColor(.2f * chroniteRatioLarge - .4f, .4f * chroniteRatioSmall + .2f, .4f * chroniteRatioSmall + .2f , this.alpha);
         this.spriteLayer2.setColor(.2f * chroniteRatioLarge - .2f, .5f * chroniteRatioSmall + .3f, .6f * chroniteRatioSmall + .4f , this.alpha);
@@ -258,8 +300,10 @@ public class Player {
         if (this.fireCooldownEndTime < System.currentTimeMillis()) {
             this.bulletFireSound.play(Globals.musicAudioLevel);
             this.fireCooldownEndTime = System.currentTimeMillis() + this.fireCooldown;
-            if(numChronite - bulletCost>= 1) {
-                numChronite -= bulletCost;
+            if(numChronite - bulletCost >= 1) {
+                if(!Globals.freezeTime) {
+                    numChronite -= bulletCost;
+                }
             } else {
                 Globals.gameGoing = false;
             } 

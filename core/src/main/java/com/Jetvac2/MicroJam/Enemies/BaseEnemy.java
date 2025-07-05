@@ -109,12 +109,17 @@ public class BaseEnemy {
         if(Math.abs(finalVelocity.len()) < .25f) {
             finalVelocity = new Vector2();
         }
-        enemySprites[0].translate(finalVelocity.x * dt, finalVelocity.y * dt);
+        
 
         float targetRotation = (float)Math.toDegrees(MathUtils.atan2(dy, dx)) - 90;
         float lerpFactor = lerpConstant * dt;
         float lerpedAngle = MathUtils.lerpAngleDeg(enemySprites[0].getRotation(), targetRotation, lerpFactor);
-        enemySprites[0].setRotation(lerpedAngle);
+
+        if(!Globals.freezeTime) {
+            enemySprites[0].translate(finalVelocity.x * dt, finalVelocity.y * dt);
+            enemySprites[0].setRotation(lerpedAngle);
+        }
+        
         this.enemyHitBox.colliderPoly.setPosition(enemyPose[0], enemyPose[1]);
         this.enemyHitBox.colliderPoly.setVertices(new float[] {
             0f, 0f,

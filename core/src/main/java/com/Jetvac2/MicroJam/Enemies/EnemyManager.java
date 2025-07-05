@@ -97,7 +97,7 @@ public class EnemyManager {
                         new float[] {.25f, .25f},
                         new float[] {.25f, .25f}
                     },
-                    30, 1f, 1.2f, 5f, 3, spawnPosition);
+                    30, .8f, 1.2f, 5f, 4, spawnPosition);
                     //allowedTier += .25f;
                 break;
             default:
