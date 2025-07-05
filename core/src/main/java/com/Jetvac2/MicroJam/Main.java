@@ -10,6 +10,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -60,12 +61,10 @@ public class Main implements ApplicationListener {
         this.backgroundSpice.setDuration(backgroundSpiceLength);
         this.backgroundSpice.scaleEffect(.1f);
 
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("UI/Fonts/Roboto-Black.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 500;
-        this.scoreDisplay = generator.generateFont(parameter);
+        this.scoreDisplay = new BitmapFont(Gdx.files.internal("UI/Fonts/mainFont.fnt"));
+        this.scoreDisplay.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
         this.scoreDisplay.setColor(.1f, .1f, 0.15f, 1);
-        generator.dispose();
         this.uiBatch = new SpriteBatch(1);         
         this.menu = new Menu();
 

@@ -36,7 +36,10 @@ public class ChroniteManager {
 
             for(int i = 0; i < chroniteList.size(); i++) {
                 Chronite chronite = chroniteList.get(i);
-                chronite.age += dt;
+                if(!Globals.freezeTime) {
+                    chronite.age += dt;
+                }
+                
                 if(chronite.collected || chronite.age > maxChroniteAge) {
                     chronite.collider.active = false;
                     chroniteList.remove(i);

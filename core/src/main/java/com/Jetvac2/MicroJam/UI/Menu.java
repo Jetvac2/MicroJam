@@ -51,12 +51,8 @@ public class Menu {
     private int numScores;
     
     public Menu() {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("UI/Fonts/Roboto-Black.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 500;
-        BitmapFont buttonFont = generator.generateFont(parameter);
-        BitmapFont lableFont = generator.generateFont(parameter);
-        generator.dispose();
+        BitmapFont buttonFont = new BitmapFont(Gdx.files.internal("UI/Fonts/mainFont.fnt"));
+        BitmapFont lableFont = new BitmapFont(Gdx.files.internal("UI/Fonts/mainFont.fnt"));
         Skin skin = new Skin();
         skin.add("ButtonFont", buttonFont);
         skin.add("LabalFont", lableFont);
@@ -70,7 +66,7 @@ public class Menu {
         this.title.setFontScale(.4f);
         this.lore = new Label(loreCont, skin);
         this.lore.setWrap(true);
-        this.lore.setFontScale(.08f);
+        this.lore.setFontScale(.09f);
         this.musicVolumeLabel = new Label("Music Volume", skin);
         this.musicVolumeLabel.setFontScale(.25f);
         this.soundEffectVolumeLabel = new Label("SFX Volume", skin);
@@ -92,7 +88,7 @@ public class Menu {
         musicVolumeCon = new Container<Slider>(musicVolume);
         musicVolumeCon.setTransform(true);
         musicVolumeCon.setScale(.3f);
-        musicVolumeCon.getActor().setValue(.25f);
+        musicVolumeCon.getActor().setValue(.5f);
         soundEffectVolumeCon = new Container<Slider>(soundEffectVolume);
         soundEffectVolumeCon.setTransform(true);
         soundEffectVolumeCon.setScale(.3f);
