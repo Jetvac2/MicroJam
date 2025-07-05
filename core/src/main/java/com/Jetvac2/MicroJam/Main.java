@@ -19,9 +19,12 @@ import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -45,7 +48,8 @@ public class Main implements ApplicationListener {
     private boolean firstFrame = true;
 
     private SpriteBatch uiBatch;
-    private BitmapFont scoreDisplay;
+    private BitmapFont scoreDisplay;    
+
     GlyphLayout layout = new GlyphLayout();
     @Override
     public void create() {
@@ -172,11 +176,13 @@ public class Main implements ApplicationListener {
         
         float[] playerPose = this.player.getPlayerPose();
         float[] playerSize = this.player.getPlayerSize();
-        this.backgroundSpice.setPosition(playerPose[0]+playerSize[0]/2, playerPose[1]+playerSize[1]/2);
-        this.backgroundRenderer = new ShapeRenderer();
-        this.backgroundRenderer.setProjectionMatrix(this.worldViewport.getCamera().combined);
-        this.backgroundRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
+        this.backgroundSpice.setPosition(playerPose[0]+playerSize[0]/2, playerPose[1]+playerSize[1]/2);
+        this.backgroundRenderer.setProjectionMatrix(this.worldViewport.getCamera().combined);
+
+      
+        this.backgroundRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        
         if(this.firstFrame) {
             this.firstFrame = false;
             this.backgroundSpice.start();

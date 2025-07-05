@@ -1910,6 +1910,10 @@ preferences: {
 		b: 0.28627452
 		a: 1
 	}
+	last-import-export-path: {
+		class: java.lang.String
+		value: C:/Programming/GameDev/libGDX/MicroJam/assets/UI/Skins/UI.json
+	}
 	resources-relative: {
 		class: java.lang.Boolean
 		value: false

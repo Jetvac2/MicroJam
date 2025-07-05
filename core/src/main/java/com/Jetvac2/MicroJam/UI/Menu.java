@@ -163,6 +163,7 @@ public class Menu {
 
         if(firstFrame) {
             Gdx.input.setInputProcessor(stage);
+            stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
             this.firstFrame = false;
         }
 
