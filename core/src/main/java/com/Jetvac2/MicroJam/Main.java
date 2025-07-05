@@ -10,11 +10,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -33,8 +40,10 @@ public class Main implements ApplicationListener {
 
     private Menu menu;
     private boolean firstFrame = true;
-    
 
+    private SpriteBatch uiBatch;
+    private BitmapFont scoreDisplay;
+    GlyphLayout layout = new GlyphLayout();
     @Override
     public void create() {
         Gdx.graphics.setForegroundFPS(120);
@@ -51,13 +60,16 @@ public class Main implements ApplicationListener {
         this.backgroundSpice.setDuration(backgroundSpiceLength);
         this.backgroundSpice.scaleEffect(.1f);
 
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("UI/Fonts/Roboto-Black.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 500;
+        this.scoreDisplay = generator.generateFont(parameter);
+        this.scoreDisplay.setColor(.1f, .1f, 0.15f, 1);
+        generator.dispose();
+        this.uiBatch = new SpriteBatch(1);         
         this.menu = new Menu();
 
-        Globals.gamePlayTrack = Gdx.audio.newMusic(Gdx.files.internal("Music/GamePlayTrack.mp3"));
-        Globals.gamePlayTrack.setLooping(true);
-        Globals.gamePlayTrack.setVolume(Globals.musicAudioLevel);
-        Globals.gamePlayTrack.play();
-    
+        Globals.gamePlayTrack = Gdx.audio.newMusic(Gdx.files.internal("Music/GamePlayTrack.mp3"));    
     }
 
     @Override
@@ -151,13 +163,14 @@ public class Main implements ApplicationListener {
             this.worldViewport = new FitViewport(2f, 2f, new OrthographicCamera());
             this.worldViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         }
+        this.worldViewport.getCamera().update();;
         float[] worldSize = new float[] {this.worldViewport.getWorldWidth(), this.worldViewport.getWorldHeight()};
         
         float[] playerPose = this.player.getPlayerPose();
         float[] playerSize = this.player.getPlayerSize();
         this.backgroundSpice.setPosition(playerPose[0]+playerSize[0]/2, playerPose[1]+playerSize[1]/2);
         this.backgroundRenderer = new ShapeRenderer();
-        this.backgroundRenderer.setProjectionMatrix(this.worldViewport.getCamera().view);
+        this.backgroundRenderer.setProjectionMatrix(this.worldViewport.getCamera().combined);
         this.backgroundRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         if(this.firstFrame) {
@@ -196,7 +209,7 @@ public class Main implements ApplicationListener {
         this.backgroundRenderer.rect(playerPose[0] - worldSize[0]/2 + playerSize[0]/2 , playerPose[1] - worldSize[1]/2 + playerSize[1]/2, worldSize[0], worldSize[1]);
         this.backgroundRenderer.end();
 
-        this.backgroundSpiceBatch.setProjectionMatrix(this.worldViewport.getCamera().view);
+        this.backgroundSpiceBatch.setProjectionMatrix(this.worldViewport.getCamera().combined);
         this.backgroundSpiceBatch.begin();
         this.backgroundSpice.draw(this.backgroundSpiceBatch);
         ChroniteManager.updateChronite(dt, this.backgroundSpiceBatch);
@@ -205,9 +218,22 @@ public class Main implements ApplicationListener {
         this.player.updatePlayer(dt, worldViewport, worldSize,
             this.playerBatch);
 
-        this.enemyBatch.setProjectionMatrix(this.worldViewport.getCamera().view);
+        this.enemyBatch.setProjectionMatrix(this.worldViewport.getCamera().combined);
         this.enemyBatch.begin();
         EnemyManager.updateEnemies(dt, worldSize, enemyBatch, playerPose, playerSize);
         this.enemyBatch.end();
+        
+
+        this.uiBatch.setProjectionMatrix(this.worldViewport.getCamera().combined);
+        this.scoreDisplay.setUseIntegerPositions(false);
+        this.scoreDisplay.getData().setScale(.00025f);
+
+        
+        uiBatch.begin();
+        
+        layout.setText(scoreDisplay, "Score:" + (int)Globals.score);
+        scoreDisplay.draw(uiBatch, layout, (-layout.width / 2f) + playerPose[0] + .4f, (layout.height / 2f) + playerPose[1] + 1f);
+
+        uiBatch.end();
     }
 }

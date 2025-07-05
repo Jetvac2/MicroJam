@@ -34,8 +34,9 @@ public class Menu {
                 "Over years, the Chronite infected his mind and his thread of time until the Universal Timeline rejected his thread and " + 
                 "banished him into the Splintered Continuum, an infinite waste land of time remnants and things incomprehensible to the human mind. " + 
                 "This was the cost of his actions. In the Splintered Continuum the  chronomancer is desperately clinging to life, fighting for every second. " +
-                "To stabilize his mortal form in the Splintered Continuum requires a constant supply of Chronite.\n\n" + //
-                "Gameplay: Every action the player takes costs Chronite. To live, the player must kill the enemies and consume the Chronite they drop.\n\n" + //
+                "To stabilize his mortal form in the Splintered Continuum requires a constant supply of Chronite.\n\n" + 
+                "Gameplay: Every action the player takes costs Chronite. To live, the player must kill the enemies and consume the Chronite they drop.\n" +
+                "However, the lower on chronite the player is the more powerfull they are.\n\n" + //
                 "    How Long Can You Last?";
     private Label musicVolumeLabel;
     private Label soundEffectVolumeLabel;
@@ -158,7 +159,8 @@ public class Menu {
         ScreenUtils.clear(.1f, .1f, 0.15f, 1);
 
         if(Globals.scores.size() == this.numScores) {
-            this.scoreBoard.textEquals(genScoreBoard());
+            this.scoreBoard.setText(genScoreBoard());
+            this.numScores++;
         }
 
         this.worldSize = new Vector2(stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
