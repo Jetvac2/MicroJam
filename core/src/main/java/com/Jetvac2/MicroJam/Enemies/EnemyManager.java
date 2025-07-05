@@ -38,7 +38,7 @@ public class EnemyManager {
                     enemy.enemyHitBox.active = false;
                     enemyList.remove(i);
                     enemiesKilled++;
-                    i-=1;
+                    i--;
                 } else {
                     enemy.updateEnemy(dt, worldSize, spriteBatch, playerPosition, playerSize);
                 }

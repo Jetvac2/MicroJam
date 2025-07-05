@@ -7,6 +7,7 @@ import com.Jetvac2.MicroJam.UI.Menu;
 import com.Jetvac2.MicroJam.Util.Globals;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -61,7 +63,7 @@ public class Main implements ApplicationListener {
         this.backgroundSpice.setDuration(backgroundSpiceLength);
         this.backgroundSpice.scaleEffect(.1f);
 
-        this.scoreDisplay = new BitmapFont(Gdx.files.internal("UI/Fonts/mainFont.fnt"));
+        this.scoreDisplay = new BitmapFont(Gdx.files.internal("UI/Fonts/scoreFont.fnt"));
         this.scoreDisplay.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         this.scoreDisplay.setColor(.1f, .1f, 0.15f, 1);
@@ -90,6 +92,7 @@ public class Main implements ApplicationListener {
             this.needsResetFrame = false;
             if(Globals.gameGoing) {
                 mustReset = true;
+                
 
             } else {
                 mustReset = false;
@@ -158,7 +161,9 @@ public class Main implements ApplicationListener {
     }
 
     private void updateGame(float dt) {
-        if(this.firstFrame) { 
+        if(this.firstFrame) {
+            this.menu.dispose();
+            Gdx.input.setInputProcessor(new Stage());
             this.worldViewport = new FitViewport(2f, 2f, new OrthographicCamera());
             this.worldViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         }

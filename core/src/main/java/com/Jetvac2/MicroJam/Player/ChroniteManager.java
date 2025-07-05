@@ -55,12 +55,12 @@ public class ChroniteManager {
 
     private static void reset() {
         inStartState = true;
-            toSpawn = 0;
-            spawnPoint = new float[2];
-
-            for(int i = 0; i < chroniteList.size(); i++) {
-                chroniteList.get(i).collider.active = false;
-                chroniteList.remove(i);
-            }
+        toSpawn = 0;
+        spawnPoint = new float[2];
+        for(int i = 0; i < chroniteList.size(); i++) {
+            chroniteList.get(i).collider.active = false;
+            chroniteList.remove(i);
+            i--;
+        }
     }
 }

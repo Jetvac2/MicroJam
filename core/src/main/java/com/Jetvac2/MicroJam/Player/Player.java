@@ -116,7 +116,9 @@ public class Player {
                 if(!Globals.freezeTime) {
                     numChronite -= chroniteLossPerSecond * dt;
                 }
-            } 
+            } else {
+                numChronite = .8f;
+            }
             
             input(dt, worldViewport);
             logic(dt, worldViewport);

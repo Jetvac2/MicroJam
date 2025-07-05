@@ -49,6 +49,8 @@ public class Menu {
 
     private Label scoreBoard;
     private int numScores;
+
+    private boolean firstFrame = true;
     
     public Menu() {
         BitmapFont buttonFont = new BitmapFont(Gdx.files.internal("UI/Fonts/mainFont.fnt"));
@@ -59,7 +61,7 @@ public class Menu {
         skin.addRegions(new TextureAtlas(Gdx.files.internal("UI/Skins/UI.atlas")));
         skin.load(Gdx.files.internal("UI/Skins/UI.json"));
         this.stage = new Stage(new FitViewport(2500f, 2000f));
-        Gdx.input.setInputProcessor(stage);
+        Gdx.input.setInputProcessor(new Stage());
 
         this.title = new Label("Splintered Continuum", skin);
         this.title.setPosition(0, 0);
@@ -159,6 +161,11 @@ public class Menu {
             this.numScores++;
         }
 
+        if(firstFrame) {
+            Gdx.input.setInputProcessor(stage);
+            this.firstFrame = false;
+        }
+
         this.worldSize = new Vector2(stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
         this.title.setPosition(worldSize.x/2 - worldSize.x/2.95f, worldSize.y - worldSize.y/15);
         this.title.setSize(.15f, .15f);
@@ -185,5 +192,6 @@ public class Menu {
     }
 
     public void dispose() {        
+        this.firstFrame = true;
     }
 }
