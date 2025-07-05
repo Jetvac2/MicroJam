@@ -89,10 +89,14 @@ public class Player {
         Globals.colliders.add(this.playerHitBox);
 
         this.bulletFireSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/bulletFire.wav"));
-        this.timeFreezeEffect = Gdx.audio.newSound(Gdx.files.internal("Music/TimeFreezeEffect.wav"));
+        this.timeFreezeEffect = Gdx.audio.newSound(Gdx.files.internal("Music/TimeFreezeEffect.mp3"));
     }
 
     public void updatePlayer(float dt, Viewport worldViewport, float[] worldSize, SpriteBatch spriteBatch) {
+        if(Gdx.input.justTouched() && !Globals.bulletFireEffectPrepped) {
+            this.bulletFireSound.play(0f);
+            Globals.bulletFireEffectPrepped = true;
+        }
         if(setPlayerStartPosition) {
             this.playerSprite.setPosition(worldSize[0]/2, worldSize[1]/2);
             this.setPlayerStartPosition = false;
@@ -106,7 +110,7 @@ public class Player {
         }
 
         if(!Globals.gameGoing) {
-            Gdx.graphics.setWindowedMode(20, 20);
+            //Gdx.graphics.setWindowedMode(20, 20);
         }
         
         input(dt, worldViewport);

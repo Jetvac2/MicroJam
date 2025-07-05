@@ -25,7 +25,6 @@ public class Bullet {
     private float baseDamage = 5f;
     private float powerMult;
     public boolean isDead = false;
-    private Sound explodingSoundEffect;
     private float maxVelocity = 5f;
     public Bullet(float[] spawnPose, float[] velocity, float angleDeg) {
         this.texture = new Texture("Sprites/Bullet.png");
@@ -33,7 +32,7 @@ public class Bullet {
         this.sprite.setSize(.1f, .1f);
         this.sprite.setPosition(spawnPose[0] - this.sprite.getWidth() / 2f,
             spawnPose[1] - this.sprite.getHeight() / 2f
-);
+        );
         this.sprite.setOriginCenter();
         this.sprite.setRotation(angleDeg);
 
@@ -47,7 +46,6 @@ public class Bullet {
         this.startTime = System.currentTimeMillis();
         this.lifeTime = maxLifeTime * Player.numChronite / Player.maxChronite;
         this.powerMult = (Player.maxChronite / Player.numChronite) * 1.5f;
-        this.explodingSoundEffect = Gdx.audio.newSound(Gdx.files.local("SoundEffects/bulletExplodingSoundEffect.wav"));
         Globals.colliders.add(this.collider);
     }
 
@@ -83,7 +81,10 @@ public class Bullet {
                 if(Intersector.overlapConvexPolygons(this.collider.colliderPoly, collider.colliderPoly)) {
                     if(!collider.name.equals("Player") && !collider.name.equals("Bullet")) {
                         this.isDead = true;
-                        this.explodingSoundEffect.play(Globals.soundEffectAudioLevel);
+
+                        Globals.bulletExplodingSoundEffect.setVolume(Globals.soundEffectAudioLevel);
+                        Globals.bulletExplodingSoundEffect.setLooping(false);
+                        Globals.bulletExplodingSoundEffect.play();
                     }
                 }
             }

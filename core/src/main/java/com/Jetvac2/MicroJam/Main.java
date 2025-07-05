@@ -46,7 +46,7 @@ public class Main implements ApplicationListener {
         this.backgroundSpice.setDuration(backgroundSpiceLength);
         this.backgroundSpice.scaleEffect(.1f);
         this.backgroundSpice.start();
-        Globals.gamePlayTrack = Gdx.audio.newMusic(Gdx.files.local("Music/GamePlayTrack.wav"));
+        Globals.gamePlayTrack = Gdx.audio.newMusic(Gdx.files.internal("Music/GamePlayTrack.mp3"));
         Globals.gamePlayTrack.setLooping(true);
         Globals.gamePlayTrack.play();
     
@@ -61,6 +61,21 @@ public class Main implements ApplicationListener {
     public void render() {
         float dt = Gdx.graphics.getDeltaTime();
         ScreenUtils.clear(Color.BLACK);
+        if (Gdx.input.justTouched() && !Globals.musicStarted) {
+            Globals.gamePlayTrack.setVolume(Globals.musicAudioLevel); // or your desired volume
+            Globals.gamePlayTrack.setLooping(true);
+            Globals.gamePlayTrack.play();
+            Globals.musicStarted = true;
+        }
+
+          if(Gdx.input.justTouched() && !Globals.bulletExplodeEffectPrepped) {
+            Globals.initBulletSound();
+            Globals.bulletExplodingSoundEffect.setVolume(0);
+            Globals.bulletExplodingSoundEffect.setLooping(false);
+            Globals.bulletExplodingSoundEffect.play();
+            Globals.bulletExplodeEffectPrepped = true;
+        }
+
         float[] worldSize = new float[] {this.worldViewport.getWorldWidth(), this.worldViewport.getWorldHeight()};
         this.worldViewport.apply();
         float[] playerPose = this.player.getPlayerPose();
