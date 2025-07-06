@@ -10,6 +10,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -22,6 +23,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.graphics.profiling.GL20Interceptor;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -40,7 +42,7 @@ public class Main implements ApplicationListener {
 
     private ParticleEffect backgroundSpice;
     private SpriteBatch backgroundSpiceBatch;
-    private int backgroundSpiceLength = 5;
+    private int backgroundSpiceLength = 10;
     private boolean needsResetFrame = false;
     private boolean mustReset = false;
 
@@ -66,6 +68,7 @@ public class Main implements ApplicationListener {
         this.backgroundSpice.loadEmitterImages(Gdx.files.internal("ParticalEffect/"));
         this.backgroundSpice.setDuration(backgroundSpiceLength);
         this.backgroundSpice.scaleEffect(.1f);
+        this.backgroundSpice.setEmittersCleanUpBlendFunction(true);
 
         this.scoreDisplay = new BitmapFont(Gdx.files.internal("UI/Fonts/scoreFont.fnt"));
         this.scoreDisplay.getRegion().getTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -74,7 +77,7 @@ public class Main implements ApplicationListener {
         this.uiBatch = new SpriteBatch(1);         
         this.menu = new Menu();
 
-        Globals.gamePlayTrack = Gdx.audio.newMusic(Gdx.files.internal("Music/GamePlayTrack.mp3"));    
+        Globals.gamePlayTrack = Gdx.audio.newMusic(Gdx.files.internal("Music/GamePlayTrack.mp3")); 
     }
 
     @Override
@@ -90,7 +93,6 @@ public class Main implements ApplicationListener {
     public void render() {
         float dt = Gdx.graphics.getDeltaTime();
         initSound();
-        
         if(Globals.gameGoing || (needsResetFrame && mustReset)) {
             ScreenUtils.clear(Color.BLACK);
             this.needsResetFrame = false;
@@ -171,6 +173,7 @@ public class Main implements ApplicationListener {
             this.worldViewport = new FitViewport(2f, 2f, new OrthographicCamera());
             this.worldViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         }
+
         this.worldViewport.getCamera().update();;
         float[] worldSize = new float[] {this.worldViewport.getWorldWidth(), this.worldViewport.getWorldHeight()};
         
@@ -238,6 +241,16 @@ public class Main implements ApplicationListener {
         this.scoreDisplay.setUseIntegerPositions(false);
         this.scoreDisplay.getData().setScale(.00025f);
 
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_DST_COLOR, GL20.GL_ZERO);
+
+
+        if(Globals.freezeTime) {
+            this.backgroundRenderer.begin(ShapeType.Filled);
+            this.backgroundRenderer.setColor(.6f, .6f, .5f, 1f);
+            this.backgroundRenderer.rect(playerPose[0] - worldSize[0]/2 + playerSize[0]/2 , playerPose[1] - worldSize[1]/2 + playerSize[1]/2, worldSize[0], worldSize[1]);
+            this.backgroundRenderer.end();
+        }
         
         uiBatch.begin();
         
@@ -245,5 +258,6 @@ public class Main implements ApplicationListener {
         scoreDisplay.draw(uiBatch, layout, (-layout.width / 2f) + playerPose[0] + .4f, (layout.height / 2f) + playerPose[1] + 1f);
 
         uiBatch.end();
+        
     }
 }

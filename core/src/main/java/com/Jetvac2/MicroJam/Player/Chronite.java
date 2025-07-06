@@ -25,6 +25,7 @@ public class Chronite {
     private float degreesPerSecond = (int)(Math.random() * 360) - 180;
     public float age;
     private Sound chronitePickUpSoundEffect;
+    private float lastFrameCurrentTime = 0;
 
     public Chronite(float[] spawnOrgin) {
         this.tex = new Texture("Sprites/ChroniteShard.png");
@@ -52,26 +53,30 @@ public class Chronite {
     }
 
     public void updateChronite(float dt, SpriteBatch spriteBatch) {
-        this.sprite.rotate(this.degreesPerSecond * dt);
-        if(colorChangeEndTime < System.currentTimeMillis()) {
-            this.colorChangeEndTime = System.currentTimeMillis() + this.colorChangeTime;
-            if(this.nextColorIndex == 2) {
-                this.nextColorIndex = 0;
-            } else {
-                this.nextColorIndex++;
+        float currentTime = this.lastFrameCurrentTime;
+        if(!Globals.freezeTime) {
+            currentTime = System.currentTimeMillis();
+            this.sprite.rotate(this.degreesPerSecond * dt);
+            if(colorChangeEndTime < currentTime) {
+                this.colorChangeEndTime = currentTime + this.colorChangeTime;
+                if(this.nextColorIndex == 2) {
+                    this.nextColorIndex = 0;
+                } else {
+                    this.nextColorIndex++;
+                }
+                if(this.currentColorIndex == 2) {
+                    this.currentColorIndex = 0;
+                } else {
+                    this.currentColorIndex++;
+                }
             }
-            if(this.currentColorIndex == 2) {
-                this.currentColorIndex = 0;
-            } else {
-                this.currentColorIndex++;
-            }
-        }
+        } 
         float[] currentColor = Utils.interpolateColor(
             colors[this.currentColorIndex], colors[nextColorIndex],
-            (float)this.colorChangeTime, (float)(this.colorChangeEndTime - System.currentTimeMillis()));
+            (float)this.colorChangeTime, (float)(this.colorChangeEndTime - currentTime));
         this.sprite.setColor(currentColor[0], currentColor[1], currentColor[2], currentColor[3]);
-        // Update color
         this.sprite.draw(spriteBatch);
+        this.lastFrameCurrentTime = currentTime;
         checkCollisions();
     }
 

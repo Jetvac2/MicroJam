@@ -122,18 +122,20 @@ lowMax: 0.0
 highMin: 1.0
 highMax: 1.0
 relative: false
-scalingCount: 4
-scaling0: 0.0
-scaling1: 0.033898823
-scaling2: 0.033898823
-scaling3: 0.050847974
-timelineCount: 4
+scalingCount: 5
+scaling0: 0.05084694
+scaling1: 0.067797646
+scaling2: 0.10169543
+scaling3: 0.10169491
+scaling4: 0.050847974
+timelineCount: 5
 timeline0: 0.0
-timeline1: 0.5208333
-timeline2: 0.9097222
-timeline3: 1.0
+timeline1: 0.4652778
+timeline2: 0.6597222
+timeline3: 0.8958333
+timeline4: 1.0
 - Options - 
-attached: false
+attached: true
 continuous: true
 aligned: false
 additive: true
@@ -141,8 +143,5 @@ behind: false
 premultipliedAlpha: false
 spriteMode: single
 - Image Paths -
-particle.png
-particle.png
-BackgroundPartical.png
-pre_particle.png
+Partical1.png
 
