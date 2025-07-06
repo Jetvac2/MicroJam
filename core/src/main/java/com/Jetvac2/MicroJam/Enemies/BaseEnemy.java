@@ -165,6 +165,10 @@ public class BaseEnemy {
         return new float[] {this.enemySprites[0].getX(), this.enemySprites[0].getY()};
     }
 
+    public Vector2 getEnemyPoseVec() {
+        return new Vector2(this.enemySprites[0].getX(), this.enemySprites[0].getY());
+    }
+
     public float[] getEnemySize() {
         return new float[] {this.enemySprites[0].getWidth(), this.enemySprites[0].getHeight()};
     }

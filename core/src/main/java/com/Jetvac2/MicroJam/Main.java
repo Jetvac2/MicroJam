@@ -227,7 +227,7 @@ public class Main implements ApplicationListener {
 
         this.enemyBatch.setProjectionMatrix(this.worldViewport.getCamera().combined);
         this.enemyBatch.begin();
-        EnemyManager.updateEnemies(dt, worldSize, enemyBatch, playerPose, playerSize);
+        EnemyManager.updateEnemies(dt, worldSize, enemyBatch, playerPose, playerSize, this.player.getVelocity());
         this.enemyBatch.end();
         
 

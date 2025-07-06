@@ -354,4 +354,8 @@ public class Player {
         Globals.canHitPlayer = true;
         Globals.freezeTime = false;
     }
+
+    public float[] getVelocity() {
+        return new float[] {this.velocity.x, this.velocity.y};
+    }
 }
