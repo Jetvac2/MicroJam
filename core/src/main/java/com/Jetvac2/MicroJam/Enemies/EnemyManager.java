@@ -1,13 +1,17 @@
 package com.Jetvac2.MicroJam.Enemies;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Vector;
 
+import com.Jetvac2.MicroJam.Enemies.BaseEnemy.State;
 import com.Jetvac2.MicroJam.Player.ChroniteManager;
 import com.Jetvac2.MicroJam.Util.Globals;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import java.util.Random;
+
 
 public class EnemyManager {
     private static boolean inStartState = true;
@@ -18,14 +22,53 @@ public class EnemyManager {
     private static float spawnAngleRange = 45f;
     private static float minSpawnDistenceFromOther = .35f;
     private static double wavePauseTime = 2000;//3000;
-    private static double enemySpawnInterval = 1300;//1000;
+    private static double enemySpawnInterval = 1000;//1000;
     private static double enemySpawnNext = System.currentTimeMillis() + enemySpawnInterval;
     private static int maxEnemyCount = 10;
     private static int enemiesKilled = 0;
     private static int waveThreashhold = 4;
 
+    private static int maxAttackers = 2;
+    private static State[] states = new State[] {State.ATTACKER1, State.ATTACKER2, State.ATTACKER3, State.ATTACKER4};
+    private static AttackerData[] currentAttackers;
+    private static float minHPToAttack = 5f;
+    private static ArrayList<DistData> disVectors = new ArrayList<DistData>();
+    
     public static void updateEnemies(float dt, float[] worldSize, SpriteBatch spriteBatch, float[] playerPosition, float[] playerSize, float[] playerVelocity) {
+        if(currentAttackers == null) {
+            currentAttackers = new AttackerData[maxAttackers];
+            for(int i = 0; i < currentAttackers.length; i++) {
+                currentAttackers[i] = new AttackerData();
+                currentAttackers[i].index = -1;
+            }
+        }
+        for(int i = 0; i < currentAttackers.length && i < enemyList.size(); i++) {
+            if(currentAttackers[i].index == -1) {
+                Random rand = new Random();
+                currentAttackers[i].state = states[rand.nextInt(0, states.length)];
+            } else if(enemyList.get(currentAttackers[i].index).HP < minHPToAttack) {
+                Random rand = new Random();
+                currentAttackers[i].state = states[rand.nextInt(0, states.length)];
+                currentAttackers[i].index = -1;
+            }
+        }
         
+        Vector2 playerPose = new Vector2(playerPosition[0] + playerSize[0]/2, playerPosition[1] + playerSize[1]/2);
+        for(int j = 0; j < currentAttackers.length && j < enemyList.size(); j++) {
+            if(currentAttackers[j].index == -1) {
+                Vector2 goalPoint = BaseEnemy.calcGoal(currentAttackers[j].state, playerPose, playerSize);
+                for(int i = 0; i < enemyList.size() && i < enemyList.size(); i++) {
+                    disVectors.add(new DistData(enemyList.get(i).getEnemyPoseVec().sub(goalPoint).len2(), i));
+                }
+                disVectors.sort((a, b) -> a.compare(b));
+                currentAttackers[j].index = disVectors.get(0).index;
+                enemyList.get(currentAttackers[j].index).state = currentAttackers[j].state;
+                disVectors.remove(0);
+            }
+        }
+        
+        disVectors.clear();
+
         if(Globals.gameGoing) {
             if(enemySpawnNext == -1) {
                 enemySpawnNext = System.currentTimeMillis() + enemySpawnInterval/2;
@@ -37,6 +80,14 @@ public class EnemyManager {
                     if(!enemy.dirty) {
                         ChroniteManager.spawnChronite(enemy.droppedChronite, enemy.getEnemyPose());
                         Globals.score += enemy.enemyHitBox.data[1];
+                    }
+                    for(int q = 0; q < currentAttackers.length && q < enemyList.size(); q++) {
+                        if(currentAttackers[q].index > i) {
+                            currentAttackers[q].index--;
+                        }
+                        if(currentAttackers[q].index == i) {
+                            currentAttackers[q].index = -1;
+                        }
                     }
                     enemy.enemyHitBox.active = false;
                     enemyList.remove(i);
@@ -53,7 +104,6 @@ public class EnemyManager {
     }
 
     private static void spawnEnemies(float dt, float[] worldSize, float[] playerPosition, float[] playerSize, float[] playerVelocity) {
-        
         if(Globals.freezeTime) {
             enemySpawnNext += dt/1000f;
         } else if (System.currentTimeMillis() > enemySpawnNext) {
@@ -110,6 +160,7 @@ public class EnemyManager {
     }
 
     private static void reset() {
+        currentAttackers = null;
         enemiesKilled = 0;
         enemySpawnNext = -1;
         for(int i = 0; i < enemyList.size(); i++) {

@@ -1,5 +1,7 @@
 package com.Jetvac2.MicroJam.Enemies;
 
+import java.util.Vector;
+
 import com.Jetvac2.MicroJam.Player.Player;
 import com.Jetvac2.MicroJam.Util.Collider;
 import com.Jetvac2.MicroJam.Util.Globals;
@@ -27,7 +29,8 @@ public class BaseEnemy {
     private float minSpeedMult = .5f;
     public boolean dirty = false;
     private Sound playerHitSound;
-    
+    public State state;
+    private Vector2 defenceOffset;
 
     public BaseEnemy(String enemyType, String[] textureFiles, float[][] scale, float HP, float speed, float hpSpeedMult, float chroniteDamage, int droppedChronite, float[] spawnPosition, float score) {
         this.enemySprites = new Sprite[textureFiles.length];
@@ -51,8 +54,18 @@ public class BaseEnemy {
         this.spawnPosition = spawnPosition;
         this.hpSpeedMult = hpSpeedMult;
         this.playerHitSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/PlayerHit.wav"));
+        this.defenceOffset = new Vector2(MathUtils.randomSign() * MathUtils.random(.3f, .45f), MathUtils.randomSign() * MathUtils.random(.3f, .45f));
         Globals.colliders.add(this.enemyHitBox);
     }
+
+    public static enum State {
+        ATTACKER1,
+        ATTACKER2,
+        ATTACKER3,
+        ATTACKER4,
+        DEFEND
+    }
+
 
     public void updateEnemy(float dt, float[] worldSize, SpriteBatch spriteBatch, float[] playerPose, float[] playerSize) {
         if(setStartPosition) {
@@ -67,53 +80,40 @@ public class BaseEnemy {
     private void logic(float dt, float[] playerPose, float[] playerSize) {
         float[] enemyPose = getEnemyPose();
 
-        float dx = playerPose[0] - playerSize[0]/2 - enemyPose[0] + enemySprites[0].getWidth()/2;
-        float dy = playerPose[1] - playerSize[1]/2 - enemyPose[1] + enemySprites[0].getHeight()/2;
-
-        float distance = (float) Math.sqrt(dx * dx + dy * dy);
-
-        float attackRadius = 0.3f; // How close enemies must be to attack
-        boolean isAttacking = distance < attackRadius;
-
-        Vector2 separation = new Vector2();
-
-        if (!isAttacking) {
-            float separationRadius = .5f;
-            for (Collider other : Globals.colliders) {
-                if (other == this.enemyHitBox || !other.name.equals(this.enemyHitBox.name)) continue;
-
-                float ox = other.colliderPoly.getX();
-                float oy = other.colliderPoly.getY();
-                float ex = enemyPose[0];
-                float ey = enemyPose[1];
-
-                float distSq = (ox - ex) * (ox - ex) + (oy - ey) * (oy - ey);
-                if (distSq < separationRadius * separationRadius && distSq > 0.0001f) {
-                    float dist = (float) Math.sqrt(distSq);
-                    float push = (separationRadius - dist) / separationRadius;
-                    separation.add((ex - ox) / dist * push, (ey - oy) / dist * push);
-                }
-            }
+        Vector2 playerPosition = new Vector2(playerPose[0] + playerSize[0]/2, playerPose[1] + playerSize[1]/2);
+        Vector2 enemyPosition = new Vector2(this.getEnemyPoseVec());
+        enemyPosition.x += this.getEnemySize()[0]/2;
+        enemyPosition.y += this.getEnemySize()[1]/2;
+        Vector2 goalPosition;
+        if(state != null) {
+            goalPosition = BaseEnemy.calcGoal(state, playerPosition, playerSize);
+        } else {
+            goalPosition = new Vector2(playerPosition).add(defenceOffset);
         }
-
-        Vector2 toPlayer = new Vector2(dx, dy).nor().scl(speed);
-        Vector2 finalVelocity = toPlayer.add(separation).nor().scl(speed);
-        finalVelocity.x *=  Math.max((HP / maxHP * hpSpeedMult), this.minSpeedMult);
-        finalVelocity.y *=  Math.max((HP / maxHP * hpSpeedMult), this.minSpeedMult);
-        if(Math.abs(finalVelocity.len()) < .25f) {
-            finalVelocity = new Vector2();
-        }
+        Vector2 positionDelta = new Vector2(enemyPosition).sub(goalPosition);
         
+        Vector2 speedVector = new Vector2(positionDelta).nor().scl(-this.speed * this.hpSpeedMult * (HP / maxHP)).scl(dt);
+        
+        if((state != null || Math.abs(positionDelta.len()) > .125f) && !Globals.freezeTime) {
+            this.enemySprites[0].translate(speedVector.x, speedVector.y);
+        }
 
-        float targetRotation = (float)Math.toDegrees(MathUtils.atan2(dy, dx)) - 90;
-        float lerpFactor = lerpConstant * dt;
-        float lerpedAngle = MathUtils.lerpAngleDeg(enemySprites[0].getRotation(), targetRotation, lerpFactor);
+        float rotationGoal;
+        float degs;
+        if(Math.abs(positionDelta.len()) < .125f) {
+            Vector2 delta = new Vector2(enemyPosition).sub(playerPosition);
+            rotationGoal = (float)Math.toDegrees(Math.atan2(delta.y, delta.x)) + 90f;
+            degs = MathUtils.lerpAngleDeg(this.enemySprites[0].getRotation(), rotationGoal, lerpConstant * dt);
+        } else {
+            rotationGoal = (float)Math.toDegrees(Math.atan2(positionDelta.y, positionDelta.x)) + 90f;
+            degs = MathUtils.lerpAngleDeg(this.enemySprites[0].getRotation(), rotationGoal, lerpConstant * dt);
+        }
 
         if(!Globals.freezeTime) {
-            enemySprites[0].translate(finalVelocity.x * dt, finalVelocity.y * dt);
-            enemySprites[0].setRotation(lerpedAngle);
+            this.enemySprites[0].setRotation(degs);
         }
         
+
         this.enemyHitBox.colliderPoly.setPosition(enemyPose[0], enemyPose[1]);
         this.enemyHitBox.colliderPoly.setVertices(new float[] {
             0f, 0f,
@@ -121,6 +121,7 @@ public class BaseEnemy {
             enemySprites[0].getWidth()/2, enemySprites[0].getHeight()
         });
         this.enemyHitBox.colliderPoly.setRotation(this.enemySprites[0].getRotation());
+
         checkCollisions();
     }
 
@@ -171,6 +172,20 @@ public class BaseEnemy {
 
     public float[] getEnemySize() {
         return new float[] {this.enemySprites[0].getWidth(), this.enemySprites[0].getHeight()};
+    }
+
+    public static Vector2 calcGoal(State state, Vector2 playerPosition, float[] playerSize) {
+        if(state == State.ATTACKER1) {
+            return new Vector2(playerPosition).add(new Vector2(playerSize[0]/2, 0));
+        } else if(state == State.ATTACKER2) {
+            return new Vector2(playerPosition).sub(new Vector2(playerSize[0]/2, 0));
+        } else if(state == State.ATTACKER3) {
+            return new Vector2(playerPosition).add(new Vector2(0, playerSize[0]/2));
+        } else if(state == State.ATTACKER4) {
+            return new Vector2(playerPosition).sub(new Vector2(0, playerSize[0]/2));
+        } else {
+            return new Vector2();
+        }
     }
 }
 
