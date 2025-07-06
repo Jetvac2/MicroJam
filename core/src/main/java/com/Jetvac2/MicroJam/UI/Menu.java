@@ -26,8 +26,8 @@ public class Menu {
 private String loreCont = "     A man, terrified of death, became a chronomancer(Time Mage) in pursuit of immortality. His obsession granted him immense power, but eternal life remained out of reach. " +
                         "Near death, he discovered a gem, Chronite(solidified time mana), which slowly warped his mind and timeline. Rejected by the Universal Timeline, he was forced into the Splintered Continuum: " +
                         "a wasteland of time remnants and incomprehensible horrors. There, his body twisted into the likeness of the geometric abominations that dwell within. " +
-                        "Desperate to survive, he slaughters profane constructs and absorbs their Chronite to extend his fleeting life.\n\n" + 
-                        "Gameplay: Every action costs Chronite. Kill enemies to collect more. The less Chronite you have, the stronger you become. Near depletion, time freezes briefly—" +
+                        "Desperate to survive, he slaughters the profane constructs and absorbs their Chronite to extend his fleeting life.\n\n" + 
+                        "Gameplay: Every action costs Chronite. Kill enemies to collect more. The less Chronite you have, the stronger you become. Near depletion, time freezes briefly, " +
                         "but this permanently lowers your max Chronite.(If you get hit while low on Chronite you will still die, the time freeze ONLY tirggers from time and action bassed depletion)\n\n" + 
                         "    How Long Can You Last?";
     private Label musicVolumeLabel;

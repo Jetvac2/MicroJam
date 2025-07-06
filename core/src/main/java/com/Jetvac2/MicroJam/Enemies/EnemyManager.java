@@ -44,11 +44,9 @@ public class EnemyManager {
         }
         for(int i = 0; i < currentAttackers.length && i < enemyList.size(); i++) {
             if(currentAttackers[i].index == -1) {
-                Random rand = new Random();
-                currentAttackers[i].state = states[rand.nextInt(0, states.length)];
+                currentAttackers[i].state = states[MathUtils.random(states.length - 1)];
             } else if(enemyList.get(currentAttackers[i].index).HP < minHPToAttack) {
-                Random rand = new Random();
-                currentAttackers[i].state = states[rand.nextInt(0, states.length)];
+                currentAttackers[i].state = states[MathUtils.random(states.length - 1)];
                 currentAttackers[i].index = -1;
             }
         }
