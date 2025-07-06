@@ -18,11 +18,11 @@ public class EnemyManager {
 
     private static ArrayList<BaseEnemy> enemyList = new ArrayList<BaseEnemy>();
     private static float minSpawnDis = 1.4f;
-    private static float maxSpawnDis = 3f;
+    private static float maxSpawnDis = 2f;
     private static float spawnAngleRange = 45f;
     private static float minSpawnDistenceFromOther = .35f;
     private static double wavePauseTime = 2000;//3000;
-    private static double enemySpawnInterval = 1000;//1000;
+    private static double enemySpawnInterval = 1300;//1000;
     private static double enemySpawnNext = System.currentTimeMillis() + enemySpawnInterval;
     private static int maxEnemyCount = 10;
     private static int enemiesKilled = 0;
@@ -124,7 +124,7 @@ public class EnemyManager {
             if(playerVelocityVec.len() != 0) {
                 spawnPosition = playerVelocityVec.nor();
             } else {
-                spawnPosition = new Vector2(MathUtils.random(-1, 1), MathUtils.random(-1, 1)).nor();
+                spawnPosition = new Vector2(MathUtils.randomSign() * MathUtils.random(.5f, 1), MathUtils.randomSign() * MathUtils.random(.5f, 1)).nor();
             }
             
             spawnPosition.scl(MathUtils.random(minSpawnDis, maxSpawnDis));
@@ -168,6 +168,7 @@ public class EnemyManager {
             enemyList.remove(i);
             i--;
         }
+        enemyList.clear();
     }
 
   

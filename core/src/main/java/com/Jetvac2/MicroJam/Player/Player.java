@@ -298,7 +298,7 @@ public class Player {
 
     private void spawnBullet(float dt, Viewport wordViewport) {
         if (this.fireCooldownEndTime < System.currentTimeMillis()) {
-            this.bulletFireSound.play(Globals.musicAudioLevel);
+            this.bulletFireSound.play(Globals.soundEffectAudioLevel);
             this.fireCooldownEndTime = System.currentTimeMillis() + this.fireCooldown;
             if(numChronite - bulletCost >= 1) {
                 if(!Globals.freezeTime) {
