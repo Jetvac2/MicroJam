@@ -24,8 +24,8 @@ public class Globals {
     public static ArrayList<Float> scores = new ArrayList<Float>();
     public static float score = 0f;
     public static float chroniteScoreAdd = 100f;
-    public static float scoreAddPerSecond = 200f;
-    public static float scoreAddPerTier1Enemy = 200f;
+    public static float scoreAddPerSecond = 25f;
+    public static float scoreAddPerTier1Enemy = 500f;
     public static float[] backgroundColor;
 
     public static void initBulletSound() {

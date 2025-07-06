@@ -215,6 +215,7 @@ public class Main implements ApplicationListener {
         this.backgroundRenderer.end();
 
         this.backgroundSpiceBatch.setProjectionMatrix(this.worldViewport.getCamera().combined);
+
         this.backgroundSpiceBatch.begin();
         this.backgroundSpice.draw(this.backgroundSpiceBatch);
         RuneManager.update(dt, playerPose[0], playerPose[1], backgroundSpiceBatch);

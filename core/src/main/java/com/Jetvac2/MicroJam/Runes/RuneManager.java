@@ -7,6 +7,7 @@ import com.Jetvac2.MicroJam.Util.Globals;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 
 public class RuneManager {
@@ -21,6 +22,7 @@ public class RuneManager {
     private static float spawnTimer = 0;
 
     private static final float MAX_DISTANCE = 30f; 
+    private static final float MAX_RUNE_CONNECTION_DIS = 2f; 
     private static int cleanupIndex = 0;
     private static final int CLEANUP_PER_FRAME = 8;
 

@@ -126,6 +126,7 @@ public class EnemyManager {
         for(int i = 0; i < enemyList.size(); i++) {
             enemyList.get(i).enemyHitBox.active = false;
             enemyList.remove(i);
+            i--;
         }
     }
 

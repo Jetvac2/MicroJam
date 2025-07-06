@@ -27,10 +27,12 @@ public class Player {
     public Collider playerHitBox;
     private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
 
-    private float[] velocity = new float[] {0f, 0f};  
-    private float acceleration = 5f;                         
-    private float deceleration = 20f;
+    private Vector3 velocity = new Vector3();
     private float maxSpeed = 1.5f;
+    private float trueMaxSpeed = 2.5f;
+    private float acceleration = 5f;
+    private float deceleration = 20f;
+
 
     private boolean setPlayerStartPosition = true;
 
@@ -43,8 +45,8 @@ public class Player {
     private double fireCooldown = 500;
     private double fireCooldownEndTime = -1;
     private float bulletSpawnOffset = 0f;
-    private float bulletCost = 1.25f;
-    private float chroniteLossPerSecond = .6f;
+    private float bulletCost = .75f;
+    private float chroniteLossPerSecond = 1.5f;
     private float[] spriteLayer4BaseSize;
 
 
@@ -57,11 +59,11 @@ public class Player {
     private float minChroniteToFreezeTime = 14.6f;
 
     private Sound bulletFireSound;
-    private float trueMaxSpeed = 2.5f;
     private float alpha = 1f;
 
     private Sound timeFreezeEffect;
     private Sound playerDeath;
+
 
     public Player() {
         this.playerSprite = new Sprite(new Texture("Sprites/Player/PlayerTexBase.png"));
@@ -131,59 +133,41 @@ public class Player {
     }
 
     private void input(float dt, Viewport worldViewport) {
-        // Base Player Movement
-        // Horizontal movement
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            velocity[0] += acceleration * dt;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            velocity[0] -= acceleration * dt;
+        if(Gdx.input.isKeyPressed(Input.Keys.W)) {
+            this.velocity.y += this.acceleration * dt;
+        } else if(Gdx.input.isKeyPressed(Input.Keys.S)) {
+            this.velocity.y -= this.acceleration * dt;
         } else {
-            if (velocity[0] > 0) {
-                velocity[0] -= deceleration * dt;
-                if (velocity[0] < 0) velocity[0] = 0;
-            } else if (velocity[0] < 0) {
-                velocity[0] += deceleration * dt;
-                if (velocity[0] > 0) velocity[0] = 0;
-            }
+            if(Math.abs(this.velocity.y) < .5f) {
+                this.velocity.y = 0;
+            } else {
+                this.velocity.y += -Math.signum(this.velocity.y) * deceleration * dt;
+            }   
         }
 
-        // Vertical movement
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            velocity[1] += acceleration * dt;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            velocity[1] -= acceleration * dt;
+        if(Gdx.input.isKeyPressed(Input.Keys.A)) {
+            this.velocity.x -= this.acceleration * dt;
+        } else if(Gdx.input.isKeyPressed(Input.Keys.D)) {
+            this.velocity.x += this.acceleration * dt;
         } else {
-            if (velocity[1] > 0) {
-                velocity[1] -= deceleration * dt;
-                if (velocity[1] < 0) velocity[1] = 0;
-            } else if (velocity[1] < 0) {
-                velocity[1] += deceleration * dt;
-                if (velocity[1] > 0) velocity[1] = 0;
-            }
+            if(Math.abs(this.velocity.x) < .5f) {
+                this.velocity.x = 0;
+            } else {
+                this.velocity.x += -Math.signum(this.velocity.x) * deceleration * dt;
+            }  
         }
 
-        
+        float speedMult = Math.min(this.trueMaxSpeed, Math.max(.8f * (maxChronite / numChronite), maxSpeed));
+        if(Math.abs(this.velocity.len()) > speedMult) {
+            this.velocity.nor().scl(speedMult);
+        } 
+        this.playerSprite.translate(this.velocity.x * dt, this.velocity.y * dt);
 
-        // Slow Time and AOE
 
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT) ||
             Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.R)) {
             spawnBullet(dt, worldViewport);
         }
-
-        Vector2 velocityVec = new Vector2(velocity[0], velocity[1]);
-
-        if (Math.abs(velocityVec.len()) > maxSpeed) {
-            velocityVec.nor().scl(maxSpeed);
-        }
-
-        float chroniteRatio = maxChronite / numChronite;
-        Vector2 scaledVec = new Vector2(velocityVec).scl(chroniteRatio);
-        if (Math.abs(scaledVec.len()) > trueMaxSpeed) {
-            scaledVec.nor().scl(trueMaxSpeed);
-        }
-
-        playerSprite.translate(scaledVec.x * dt, scaledVec.y * dt);
 
     }
 
@@ -192,7 +176,7 @@ public class Player {
         float playerY = playerSprite.getY() + playerSprite.getHeight() / 2f;
 
         // Get current movement direction
-        Vector2 movementDir = new Vector2(velocity[0], velocity[1]);
+        Vector2 movementDir = new Vector2(velocity.x, velocity.y);
         Vector2 offset = new Vector2(movementDir).nor().scl((float)-Math.max(Math.sqrt((double)movementDir.len2()/5f), .1)).scl(.015f);
         if(Math.abs(offset.len()) > .025f) {
             offset.nor().scl(.025f);
@@ -356,7 +340,7 @@ public class Player {
             i--;
         }
 
-        velocity = new float[] {0f, 0f};  
+        this.velocity = new Vector3();
         IFrameEndTime = -1;
         fireCooldownEndTime = -1;
         freezeTimeCooldownEndTime = -1;
