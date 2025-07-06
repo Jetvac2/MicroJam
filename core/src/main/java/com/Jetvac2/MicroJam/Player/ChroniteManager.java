@@ -3,10 +3,7 @@ package com.Jetvac2.MicroJam.Player;
 import java.util.ArrayList;
 
 import com.Jetvac2.MicroJam.Util.Globals;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Polygon;
 
 public class ChroniteManager {
     private static boolean inStartState = true;

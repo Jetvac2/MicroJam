@@ -3,11 +3,9 @@ package com.Jetvac2.MicroJam.Enemies;
 import java.util.ArrayList;
 
 import com.Jetvac2.MicroJam.Player.ChroniteManager;
-import com.Jetvac2.MicroJam.Player.Player;
 import com.Jetvac2.MicroJam.Util.Globals;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class EnemyManager {
     private static boolean inStartState = true;

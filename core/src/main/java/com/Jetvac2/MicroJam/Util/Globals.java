@@ -1,12 +1,8 @@
 package com.Jetvac2.MicroJam.Util;
 
 import java.util.ArrayList;
-import java.util.Vector;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.math.Vector3;
 
 public class Globals {
     public static ArrayList<Collider> colliders = new ArrayList<Collider>();

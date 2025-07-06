@@ -1,7 +1,5 @@
 package com.Jetvac2.MicroJam.Enemies;
 
-import java.util.ArrayList;
-
 import com.Jetvac2.MicroJam.Player.Player;
 import com.Jetvac2.MicroJam.Util.Collider;
 import com.Jetvac2.MicroJam.Util.Globals;
@@ -10,12 +8,9 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class BaseEnemy {
@@ -34,7 +29,6 @@ public class BaseEnemy {
     private Sound playerHitSound;
     
 
-    // TODO: Add argumetns for partical effects for taking damage and for dieing. 
     public BaseEnemy(String enemyType, String[] textureFiles, float[][] scale, float HP, float speed, float hpSpeedMult, float chroniteDamage, int droppedChronite, float[] spawnPosition, float score) {
         this.enemySprites = new Sprite[textureFiles.length];
         for(int i = 0; i < enemySprites.length; i++) {

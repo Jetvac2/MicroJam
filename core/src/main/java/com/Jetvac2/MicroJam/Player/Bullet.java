@@ -1,11 +1,7 @@
 package com.Jetvac2.MicroJam.Player;
 
-import java.util.Vector;
-
 import com.Jetvac2.MicroJam.Util.Collider;
 import com.Jetvac2.MicroJam.Util.Globals;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
