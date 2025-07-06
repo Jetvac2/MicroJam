@@ -2,6 +2,7 @@ package com.Jetvac2.MicroJam.Player;
 
 import java.util.ArrayList;
 
+import com.Jetvac2.MicroJam.Runes.RuneManager;
 import com.Jetvac2.MicroJam.Util.Collider;
 import com.Jetvac2.MicroJam.Util.Globals;
 import com.badlogic.gdx.Gdx;
@@ -106,6 +107,7 @@ public class Player {
                 Globals.score = 0;
                 this.timeFreezeEffect.stop();
                 this.playerDeath.play(Globals.soundEffectAudioLevel);
+                RuneManager.reset();
             }
 
             if(setPlayerStartPosition) {
@@ -191,9 +193,9 @@ public class Player {
 
         // Get current movement direction
         Vector2 movementDir = new Vector2(velocity[0], velocity[1]);
-        Vector2 offset = new Vector2(movementDir).nor().scl((float)-Math.max(Math.sqrt((double)movementDir.len2()/5f), .1)).scl(.05f);
-        if(Math.abs(offset.len()) > .15f) {
-            offset.nor().scl(.15f);
+        Vector2 offset = new Vector2(movementDir).nor().scl((float)-Math.max(Math.sqrt((double)movementDir.len2()/5f), .1)).scl(.015f);
+        if(Math.abs(offset.len()) > .025f) {
+            offset.nor().scl(.025f);
         }
         float pixelsPerUnit = Gdx.graphics.getWidth() / worldViewport.getWorldWidth();
         Vector3 cameraTarget = new Vector3(playerX + offset.x, playerY + offset.y, 0);

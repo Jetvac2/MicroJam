@@ -26,6 +26,7 @@ public class Globals {
     public static float chroniteScoreAdd = 100f;
     public static float scoreAddPerSecond = 200f;
     public static float scoreAddPerTier1Enemy = 200f;
+    public static float[] backgroundColor;
 
     public static void initBulletSound() {
         bulletExplodingSoundEffect = Gdx.audio.newMusic(Gdx.files.internal("exploding.mp3"));

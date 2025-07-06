@@ -3,6 +3,7 @@ package com.Jetvac2.MicroJam;
 import com.Jetvac2.MicroJam.Enemies.EnemyManager;
 import com.Jetvac2.MicroJam.Player.ChroniteManager;
 import com.Jetvac2.MicroJam.Player.Player;
+import com.Jetvac2.MicroJam.Runes.RuneManager;
 import com.Jetvac2.MicroJam.UI.Menu;
 import com.Jetvac2.MicroJam.Util.Globals;
 import com.badlogic.gdx.ApplicationListener;
@@ -65,6 +66,8 @@ public class Main implements ApplicationListener {
         this.scoreDisplay.setColor(.1f, .1f, 0.15f, 1);
         this.uiBatch = new SpriteBatch(1);         
         this.menu = new Menu();
+        RuneManager.init(player.getPlayerPose()[0], player.getPlayerPose()[1]);
+
 
         Globals.gamePlayTrack = Gdx.audio.newMusic(Gdx.files.internal("Music/GamePlayTrack.mp3")); 
     }
@@ -87,8 +90,6 @@ public class Main implements ApplicationListener {
             this.needsResetFrame = false;
             if(Globals.gameGoing) {
                 mustReset = true;
-                
-
             } else {
                 mustReset = false;
             }
@@ -189,7 +190,9 @@ public class Main implements ApplicationListener {
 
         // Oragne to greenish purpole
         float chroniteRatioSmall = Player.numChronite / Player.maxChronite;
-        this.backgroundRenderer.setColor(.4f + (.6f * chroniteRatioSmall), .07f + (.33f * chroniteRatioSmall), 1f - (.9f * chroniteRatioSmall), 1f);
+        float[] backgroundColor = new float[] {.4f + (.6f * chroniteRatioSmall), .07f + (.33f * chroniteRatioSmall), 1f - (.9f * chroniteRatioSmall)};
+        Globals.backgroundColor = backgroundColor;
+        this.backgroundRenderer.setColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], 1f);
         for (ParticleEmitter emitter : backgroundSpice.getEmitters()) {
             // Get the number of timeline entries
             int timelineSize = emitter.getTint().getTimeline().length;
@@ -214,6 +217,7 @@ public class Main implements ApplicationListener {
         this.backgroundSpiceBatch.setProjectionMatrix(this.worldViewport.getCamera().combined);
         this.backgroundSpiceBatch.begin();
         this.backgroundSpice.draw(this.backgroundSpiceBatch);
+        RuneManager.update(dt, playerPose[0], playerPose[1], backgroundSpiceBatch);
         ChroniteManager.updateChronite(dt, this.backgroundSpiceBatch);
         this.backgroundSpiceBatch.end();
         // Render Player

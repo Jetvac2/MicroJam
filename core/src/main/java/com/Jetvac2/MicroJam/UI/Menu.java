@@ -23,17 +23,13 @@ public class Menu {
 
     private Label title;
     private Label lore;
-    private String loreCont = "     A man became obsessed with living forever, not for love of life but for fear of death. " +
-                "In pursuit of immortality, he became a chronomancer(Time Mage). From his fear and obsession stemmed great power, " +
-                "he became the strongest mage ever known. However, achieving eternal life on Earth proved impossible. " + 
-                "When he was so close to death he could barely walk, he became infatuated with a gem known as Chronite, solidified time mana. " + 
-                "Over years, the Chronite infected his mind and his thread of time until the Universal Timeline rejected his thread and " + 
-                "banished him into the Splintered Continuum, an infinite waste land of time remnants and things incomprehensible to the human mind. " + 
-                "This was the cost of his actions. In the Splintered Continuum the  chronomancer is desperately clinging to life, fighting for every second. " +
-                "To stabilize his mortal form in the Splintered Continuum requires a constant supply of Chronite.\n\n" + 
-                "Gameplay: Every action the player takes costs Chronite. To live, the player must kill the enemies and consume the Chronite they drop.\n" +
-                "However, the lower on chronite the player is the more powerfull they are.\n\n" + //
-                "    How Long Can You Last?";
+private String loreCont = "     A man, terrified of death, became a chronomancer(Time Mage) in pursuit of immortality. His obsession granted him immense power, but eternal life remained out of reach. " +
+                        "Near death, he discovered a gem, Chronite(solidified time mana), which slowly warped his mind and timeline. Rejected by the Universal Timeline, he was forced into the Splintered Continuum: " +
+                        "a wasteland of time remnants and incomprehensible horrors. There, his body twisted into the likeness of the geometric abominations that dwell within. " +
+                        "Desperate to survive, he slaughters profane constructs and absorbs their Chronite to extend his fleeting life.\n\n" + 
+                        "Gameplay: Every action costs Chronite. Kill enemies to collect more. The less Chronite you have, the stronger you become. Near depletion, time freezes briefly—" +
+                        "but this permanently lowers your max Chronite.(If you get hit while low on Chronite you will still die, the time freeze ONLY tirggers from time and action bassed depletion)\n\n" + 
+                        "    How Long Can You Last?";
     private Label musicVolumeLabel;
     private Label soundEffectVolumeLabel;
     private TextButton startGame;
