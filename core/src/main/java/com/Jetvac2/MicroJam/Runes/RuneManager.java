@@ -80,18 +80,17 @@ public class RuneManager {
     private static void spawnRunesInChunk(int chunkX, int chunkY) {
         float originX = chunkX * CHUNK_SIZE;
         float originY = chunkY * CHUNK_SIZE;
-
-        for (float x = 0; x < CHUNK_SIZE; x += 1f / runesPerSqrUnit) {
-            for (float y = 0; y < CHUNK_SIZE; y += 1f / runesPerSqrUnit) {
-                float dx = MathUtils.random(-.2f, .2f);
-                float dy = MathUtils.random(-.2f, .2f);
+        float runeSpace = 1f / runesPerSqrUnit;
+        for (float x = 0; x < CHUNK_SIZE; x += runeSpace) {
+            for (float y = 0; y < CHUNK_SIZE; y += runeSpace) {
+                float dx = MathUtils.random(0, .33f);
+                float dy = MathUtils.random(0, .33f);
                 Sprite rune = new Sprite(textures[MathUtils.random(0, 3)]);
                 rune.setSize(RUNE_SIZE, RUNE_SIZE);
                 rune.setPosition(originX + x + dx, originY + y + dy);
                 rune.setOriginCenter();
                 rune.setRotation(MathUtils.random(0f, 360f));
                 rune.setAlpha(MathUtils.random(0.3f, 0.6f));
-                System.out.println("Spawning runes in chunk: " + chunkX + "," + chunkY);
                 runes.add(rune);
             }
         }
