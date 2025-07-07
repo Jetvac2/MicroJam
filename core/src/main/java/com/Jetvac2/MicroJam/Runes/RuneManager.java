@@ -26,7 +26,6 @@ public class RuneManager {
     private static int cleanupIndex = 0;
     private static final int CLEANUP_PER_FRAME = 8;
 
-
     public static void init(float playerX, float playerY) {
         textures[0] = new Texture("Sprites/Runes/Runes1.png");
         textures[1] = new Texture("Sprites/Runes/Runes2.png");

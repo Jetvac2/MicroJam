@@ -1,17 +1,12 @@
 package com.Jetvac2.MicroJam.Enemies;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Vector;
-
 import com.Jetvac2.MicroJam.Enemies.BaseEnemy.State;
 import com.Jetvac2.MicroJam.Player.ChroniteManager;
 import com.Jetvac2.MicroJam.Util.Globals;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import java.util.Random;
-
 
 public class EnemyManager {
     private static boolean inStartState = true;
@@ -22,7 +17,7 @@ public class EnemyManager {
     private static float spawnAngleRange = 45f;
     private static float minSpawnDistenceFromOther = .35f;
     private static double wavePauseTime = 2000;//3000;
-    private static double enemySpawnInterval = 1300;//1000;
+    private static double enemySpawnInterval = 1500;//1000;
     private static double enemySpawnNext = System.currentTimeMillis() + enemySpawnInterval;
     private static int maxEnemyCount = 10;
     private static int enemiesKilled = 0;
@@ -151,7 +146,7 @@ public class EnemyManager {
                     new float[] {.25f, .25f},
                     new float[] {.25f, .25f}
                 },
-                30, .8f, 1.2f, 5f, 4, new float[] {spawnPosition.x, spawnPosition.y}, Globals.scoreAddPerTier1Enemy);
+                20, .8f, 1.2f, 3f, 4, new float[] {spawnPosition.x, spawnPosition.y}, Globals.scoreAddPerTier1Enemy);
 
                 enemyList.add(enemy);            
         }

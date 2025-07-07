@@ -28,10 +28,10 @@ public class Player {
     private ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
 
     private Vector3 velocity = new Vector3();
-    private float maxSpeed = 1.5f;
-    private float trueMaxSpeed = 2.5f;
-    private float acceleration = 5f;
-    private float deceleration = 20f;
+    private float maxSpeed = 2f;
+    private float trueMaxSpeed = 3f;
+    private float acceleration = 9f;
+    private float deceleration = 40f;
 
 
     private boolean setPlayerStartPosition = true;
@@ -46,7 +46,7 @@ public class Player {
     private double fireCooldownEndTime = -1;
     private float bulletSpawnOffset = 0f;
     private float bulletCost = .75f;
-    private float chroniteLossPerSecond = 1.5f;
+    private float chroniteLossPerSecond = 1f;
     private float[] spriteLayer4BaseSize;
 
 
